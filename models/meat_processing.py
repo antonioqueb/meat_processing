@@ -17,7 +17,7 @@ class MeatProcessingOrder(models.Model):
         ('cancelled', 'Cancelled')
     ], string='Status', default='draft')
 
-    name = fields.Char(string='Order Name')
+
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
     _description = 'Meat Processing Order Line'
