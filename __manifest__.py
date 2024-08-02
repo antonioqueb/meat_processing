@@ -1,14 +1,14 @@
 # meat_processing/__manifest__.py
 {
-    'name': 'Meat Processing',
+    'name': 'Procesamiento de Carne',
     'version': '1.0',
-    'summary': 'Module for processing and deboning beef and chicken carcasses',
+    'summary': 'Módulo para procesar y despiezar canales de res y pollo',
     'sequence': -100,
-    'description': """Manage the processing and deboning of beef and chicken carcasses.""",
+    'description': """Gestiona el procesamiento y despiece de canales de res y pollo.""",
     'category': 'Manufacturing',
-    'author': 'Your Name',
-    'website': 'http://www.yourwebsite.com',
-    'depends': ['base', 'mrp'],
+    'author': 'Tu Nombre',
+    'website': 'http://www.tuwebsite.com',
+    'depends': ['base', 'mrp', 'stock'],
     'data': [
         'security/ir.model.access.csv',
         'views/meat_processing_menu.xml',
