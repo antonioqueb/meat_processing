@@ -1,5 +1,6 @@
 <odoo>
     <data>
+        <!-- Vista de Árbol para las Órdenes de Procesamiento de Carne -->
         <record id="view_meat_processing_order_tree" model="ir.ui.view">
             <field name="name">meat.processing.order.tree</field>
             <field name="model">meat.processing.order</field>
@@ -14,6 +15,7 @@
             </field>
         </record>
 
+        <!-- Vista de Formulario para las Órdenes de Procesamiento de Carne -->
         <record id="view_meat_processing_order_form" model="ir.ui.view">
             <field name="name">meat.processing.order.form</field>
             <field name="model">meat.processing.order</field>
@@ -39,10 +41,10 @@
                             </field>
                         </group>
                         <footer>
-                            <button string="Confirm" type="object" name="action_confirm" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                            <button string="Done" type="object" name="action_done" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'confirmed')]}"/>
-                            <button string="Cancel" type="object" name="action_cancel" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ['draft', 'confirmed'])]}"/>
-                            <button string="Set to Draft" type="object" name="action_set_to_draft" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
+                            <button string="Confirm" type="object" name="action_confirm" class="oe_highlight"/>
+                            <button string="Done" type="object" name="action_done" class="oe_highlight"/>
+                            <button string="Cancel" type="object" name="action_cancel" class="oe_highlight"/>
+                            <button string="Set to Draft" type="object" name="action_set_to_draft" class="oe_highlight"/>
                         </footer>
                     </sheet>
                 </form>
