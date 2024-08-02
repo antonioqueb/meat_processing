@@ -11,6 +11,7 @@
                     <field name="customer_id"/>
                     <field name="state"/>
                     <field name="total_amount"/>
+                    <field name="notes"/>
                 </tree>
             </field>
         </record>
@@ -51,12 +52,83 @@
             </field>
         </record>
 
+        <!-- Vista Kanban de Órdenes de Procesamiento -->
+        <record id="view_meat_processing_order_kanban" model="ir.ui.view">
+            <field name="name">meat.processing.order.kanban</field>
+            <field name="model">meat.processing.order</field>
+            <field name="arch" type="xml">
+                <kanban string="Órdenes de Procesamiento de Carne">
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_card">
+                                <strong>
+                                    <field name="name"/>
+                                </strong>
+                                <div>
+                                    <field name="customer_id"/>
+                                </div>
+                                <div>
+                                    <field name="order_date"/>
+                                </div>
+                                <div>
+                                    <field name="total_amount"/>
+                                </div>
+                                <div>
+                                    <field name="state"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- Vista Calendario de Órdenes de Procesamiento -->
+        <record id="view_meat_processing_order_calendar" model="ir.ui.view">
+            <field name="name">meat.processing.order.calendar</field>
+            <field name="model">meat.processing.order</field>
+            <field name="arch" type="xml">
+                <calendar string="Órdenes de Procesamiento de Carne" date_start="order_date">
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                </calendar>
+            </field>
+        </record>
+
+        <!-- Vista Gráfica de Órdenes de Procesamiento -->
+        <record id="view_meat_processing_order_graph" model="ir.ui.view">
+            <field name="name">meat.processing.order.graph</field>
+            <field name="model">meat.processing.order</field>
+            <field name="arch" type="xml">
+                <graph string="Órdenes de Procesamiento de Carne" type="bar">
+                    <field name="total_amount" string="Monto Total"/>
+                    <field name="order_date" interval="month" string="Fecha de la Orden"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- Vista de Búsqueda de Órdenes de Procesamiento -->
+        <record id="view_meat_processing_order_search" model="ir.ui.view">
+            <field name="name">meat.processing.order.search</field>
+            <field name="model">meat.processing.order</field>
+            <field name="arch" type="xml">
+                <search string="Buscar Órdenes de Procesamiento de Carne">
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="order_date"/>
+                    <field name="state"/>
+                    <field name="total_amount"/>
+                </search>
+            </field>
+        </record>
+
         <!-- Acción de Ventana para Órdenes de Procesamiento -->
         <record id="action_meat_processing_orders" model="ir.actions.act_window">
             <field name="name">Órdenes de Procesamiento de Carne</field>
             <field name="res_model">meat.processing.order</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,kanban,calendar,graph</field>
             <field name="view_id" ref="view_meat_processing_order_tree"/>
+            <field name="search_view_id" ref="view_meat_processing_order_search"/>
         </record>
     </data>
 </odoo>
