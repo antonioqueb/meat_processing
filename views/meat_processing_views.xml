@@ -33,6 +33,5 @@
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_meat_processing_order_tree"/>
         </record>
-
     </data>
 </odoo>
