@@ -1,6 +1,5 @@
 <odoo>
     <data>
-        <!-- Vista de Árbol para las Órdenes de Procesamiento de Carne -->
         <record id="view_meat_processing_order_tree" model="ir.ui.view">
             <field name="name">meat.processing.order.tree</field>
             <field name="model">meat.processing.order</field>
@@ -15,7 +14,6 @@
             </field>
         </record>
 
-        <!-- Vista de Formulario para las Órdenes de Procesamiento de Carne -->
         <record id="view_meat_processing_order_form" model="ir.ui.view">
             <field name="name">meat.processing.order.form</field>
             <field name="model">meat.processing.order</field>
@@ -51,7 +49,6 @@
             </field>
         </record>
 
-        <!-- Acción para las Órdenes de Procesamiento de Carne -->
         <record id="action_meat_processing_orders" model="ir.actions.act_window">
             <field name="name">Meat Processing Orders</field>
             <field name="res_model">meat.processing.order</field>

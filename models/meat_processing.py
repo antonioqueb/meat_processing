@@ -1,11 +1,12 @@
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
     _description = 'Meat Processing Order'
 
-    name = fields.Char(string='Order Name', required=True)
-    order_date = fields.Date(string='Order Date', required=True)
+    name = fields.Char(string='Order Name', required=True, default=lambda self: _('New'))
+    order_date = fields.Date(string='Order Date', required=True, default=fields.Date.context_today)
     customer_id = fields.Many2one('res.partner', string='Customer', required=True)
     order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Order Lines')
     state = fields.Selection([
@@ -23,24 +24,25 @@ class MeatProcessingOrder(models.Model):
             order.total_amount = sum(line.subtotal for line in order.order_line_ids)
 
     def action_confirm(self):
-        for order in self:
-            if order.state == 'draft':
-                order.state = 'confirmed'
+        if self.state != 'draft':
+            raise UserError(_('Only draft orders can be confirmed.'))
+        self.state = 'confirmed'
 
     def action_done(self):
-        for order in self:
-            if order.state == 'confirmed':
-                order.state = 'done'
+        if self.state != 'confirmed':
+            raise UserError(_('Only confirmed orders can be marked as done.'))
+        self.state = 'done'
 
     def action_cancel(self):
-        for order in self:
-            if order.state in ['draft', 'confirmed']:
-                order.state = 'cancelled'
+        if self.state not in ['draft', 'confirmed']:
+            raise UserError(_('Only draft or confirmed orders can be cancelled.'))
+        self.state = 'cancelled'
 
     def action_set_to_draft(self):
-        for order in self:
-            if order.state == 'cancelled':
-                order.state = 'draft'
+        if self.state != 'cancelled':
+            raise UserError(_('Only cancelled orders can be set to draft.'))
+        self.state = 'draft'
+
 
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
