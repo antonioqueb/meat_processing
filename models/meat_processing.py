@@ -3,18 +3,18 @@ from odoo.exceptions import UserError
 
 class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
-    _description = 'Orden de Despiece'
+    _description = 'Orden de Procesamiento de Carne'
 
     name = fields.Char(string='Nombre de la Orden', required=True, default=lambda self: _('Nuevo'))
-    order_date = fields.Date(string='Fecha de la Orden', required=True)
-    customer_id = fields.Many2one('res.partner', string='Cliente', required=True)
-    order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden')
+    order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
+    product_ids = fields.Many2many('product.product', string='Canales', required=True)
     state = fields.Selection([
         ('draft', 'Borrador'),
-        ('confirmed', 'Confirmado'),
-        ('done', 'Hecho'),
+        ('processing', 'En Proceso'),
+        ('done', 'Finalizado'),
         ('cancelled', 'Cancelado')
     ], string='Estado', default='draft')
+    order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden')
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
 
@@ -24,10 +24,25 @@ class MeatProcessingOrder(models.Model):
             order.total_amount = sum(line.subtotal for line in order.order_line_ids)
 
     def action_confirm(self):
-        self.state = 'confirmed'
+        self.state = 'processing'
 
     def action_done(self):
-        self.state = 'done'
+        for order in self:
+            if order.state != 'processing':
+                raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
+            order.state = 'done'
+            # Eliminar las canales del inventario
+            for product in order.product_ids:
+                stock_quant = self.env['stock.quant'].search([('product_id', '=', product.id)], limit=1)
+                if stock_quant:
+                    stock_quant.sudo().unlink()
+            # Crear los productos resultantes del despiece
+            for line in order.order_line_ids:
+                self.env['stock.quant'].create({
+                    'product_id': line.product_id.id,
+                    'location_id': stock_quant.location_id.id,
+                    'quantity': line.quantity,
+                })
 
     def action_cancel(self):
         self.state = 'cancelled'
@@ -38,7 +53,7 @@ class MeatProcessingOrder(models.Model):
 
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
-    _description = 'Línea de Orden de Despiece'
+    _description = 'Línea de Orden de Procesamiento de Carne'
 
     name = fields.Char(string='Nombre de la Línea de Orden')
     order_id = fields.Many2one('meat.processing.order', string='Orden', required=True)
