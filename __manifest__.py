@@ -11,7 +11,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/meat_processing_menu.xml',
-        'views/meat_processing_order.xml',
+        'views/meat_processing_views.xml',
     ],
     'installable': True,
     'application': True,
