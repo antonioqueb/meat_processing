@@ -11,9 +11,12 @@
     'data': [
         'security/ir.model.access.csv',
         'views/meat_processing_menu.xml',
-        'views/meat_processing_views.xml',
+        'views/meat_processing_order.xml',
     ],
     'installable': True,
     'application': True,
     'auto_install': False,
+    'maintainer': 'Alphaqueb Consulting S.A.S',
+    'license': 'LGPL-3',
+    'i18n': ['i18n/es_MX.po'],
 }
