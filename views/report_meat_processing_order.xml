@@ -12,7 +12,7 @@
     <template id="report_meat_processing_order">
         <t t-call="web.external_layout">
             <div class="page">
-                <h2>Orden de Procesamiento de Carne</h2>
+                <h2>Orden de Despiece</h2>
                 <table class="table table-sm o_main_table">
                     <thead>
                         <tr>

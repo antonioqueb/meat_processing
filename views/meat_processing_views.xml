@@ -5,7 +5,7 @@
             <field name="name">meat.processing.order.tree</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
-                <tree string="Órdenes de Procesamiento de Carne">
+                <tree string="Órdenes de Despiece">
                     <field name="name"/>
                     <field name="order_date"/>
                     <field name="customer_id"/>
@@ -21,7 +21,7 @@
             <field name="name">meat.processing.order.form</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
-                <form string="Orden de Procesamiento de Carne">
+                <form string="Orden de Despiece">
                     <sheet>
                         <group>
                             <field name="name"/>
@@ -57,7 +57,7 @@
             <field name="name">meat.processing.order.kanban</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
-                <kanban string="Órdenes de Procesamiento de Carne">
+                <kanban string="Órdenes de Despiece">
                     <templates>
                         <t t-name="kanban-box">
                             <div class="oe_kanban_card">
@@ -88,7 +88,7 @@
             <field name="name">meat.processing.order.calendar</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
-                <calendar string="Órdenes de Procesamiento de Carne" date_start="order_date">
+                <calendar string="Órdenes de Despiece" date_start="order_date">
                     <field name="name"/>
                     <field name="customer_id"/>
                 </calendar>
@@ -100,7 +100,7 @@
             <field name="name">meat.processing.order.graph</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
-                <graph string="Órdenes de Procesamiento de Carne" type="bar">
+                <graph string="Órdenes de Despiece" type="bar">
                     <field name="total_amount" string="Monto Total"/>
                     <field name="order_date" interval="month" string="Fecha de la Orden"/>
                 </graph>
@@ -112,7 +112,7 @@
             <field name="name">meat.processing.order.search</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
-                <search string="Buscar Órdenes de Procesamiento de Carne">
+                <search string="Buscar Órdenes de Despiece">
                     <field name="name"/>
                     <field name="customer_id"/>
                     <field name="order_date"/>
@@ -124,7 +124,7 @@
 
         <!-- Acción de Ventana para Órdenes de Procesamiento -->
         <record id="action_meat_processing_orders" model="ir.actions.act_window">
-            <field name="name">Órdenes de Procesamiento de Carne</field>
+            <field name="name">Órdenes de Despiece</field>
             <field name="res_model">meat.processing.order</field>
             <field name="view_mode">tree,form,kanban,calendar,graph</field>
             <field name="view_id" ref="view_meat_processing_order_tree"/>

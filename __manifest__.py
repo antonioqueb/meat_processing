@@ -1,5 +1,5 @@
 {
-    'name': 'Procesamiento de Carne',
+    'name': 'Despiece',
     'version': '1.0',
     'summary': 'Módulo para procesar y despiezar canales de res y pollo',
     'sequence': -100,

@@ -3,7 +3,7 @@ from odoo.exceptions import UserError
 
 class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
-    _description = 'Orden de Procesamiento de Carne'
+    _description = 'Orden de Despiece'
 
     name = fields.Char(string='Nombre de la Orden', required=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de la Orden', required=True)
@@ -38,7 +38,7 @@ class MeatProcessingOrder(models.Model):
 
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
-    _description = 'Línea de Orden de Procesamiento de Carne'
+    _description = 'Línea de Orden de Despiece'
 
     name = fields.Char(string='Nombre de la Línea de Orden')
     order_id = fields.Many2one('meat.processing.order', string='Orden', required=True)
