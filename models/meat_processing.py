@@ -8,6 +8,7 @@ class MeatProcessingOrder(models.Model):
     name = fields.Char(string='Nombre de la Orden', required=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
+    total_kilos = fields.Float(string='Total Kilos', required=True)
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('processing', 'En Proceso'),

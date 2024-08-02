@@ -9,6 +9,7 @@
                     <field name="name"/>
                     <field name="order_date"/>
                     <field name="product_ids"/>
+                    <field name="total_kilos"/>
                     <field name="state"/>
                     <field name="total_amount"/>
                     <field name="notes"/>
@@ -27,6 +28,7 @@
                             <field name="name"/>
                             <field name="order_date"/>
                             <field name="product_ids" widget="many2many_tags"/>
+                            <field name="total_kilos"/>
                             <field name="state" readonly="1"/>
                             <field name="total_amount" readonly="1"/>
                             <field name="notes"/>
@@ -71,6 +73,9 @@
                                     <field name="total_amount"/>
                                 </div>
                                 <div>
+                                    <field name="total_kilos"/>
+                                </div>
+                                <div>
                                     <field name="state"/>
                                 </div>
                             </div>
@@ -112,6 +117,7 @@
                     <field name="name"/>
                     <field name="order_date"/>
                     <field name="state"/>
+                    <field name="total_kilos"/>
                     <field name="total_amount"/>
                 </search>
             </field>
