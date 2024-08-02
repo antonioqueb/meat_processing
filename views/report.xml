@@ -1,0 +1,13 @@
+<odoo>
+    <data>
+        <report
+            id="report_meat_processing_order"
+            model="meat.processing.order"
+            string="Meat Processing Order"
+            report_type="qweb-pdf"
+            name="meat_processing.report_meat_processing_order"
+            file="meat_processing.report_meat_processing_order"
+            print_report_name="(object.name or 'Order')"
+        />
+    </data>
+</odoo>

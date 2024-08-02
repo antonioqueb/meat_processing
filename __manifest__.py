@@ -12,6 +12,8 @@
         'security/ir.model.access.csv',
         'views/meat_processing_views.xml',  # Ensure this is loaded first
         'views/meat_processing_menu.xml',  # Then load the menu
+        'views/report_meat_processing_order.xml',  # Add the report template
+        'views/report.xml',  # Add the report definition
     ],
     'installable': True,
     'application': True,
