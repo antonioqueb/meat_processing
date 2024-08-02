@@ -17,6 +17,5 @@
     'application': True,
     'auto_install': False,
     'maintainer': 'Alphaqueb Consulting S.A.S',
-    'license': 'LGPL-3',
-    'i18n': ['i18n/es_MX.po'],
+    'license': 'LGPL-3'
 }
