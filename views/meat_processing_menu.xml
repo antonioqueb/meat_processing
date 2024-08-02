@@ -1,0 +1,6 @@
+<!-- meat_processing/views/meat_processing_menu.xml -->
+<odoo>
+    <menuitem id="menu_meat_processing_root" name="Meat Processing" sequence="10"/>
+
+    <menuitem id="menu_meat_processing_orders" name="Processing Orders" parent="menu_meat_processing_root" action="action_meat_processing_orders"/>
+</odoo>
