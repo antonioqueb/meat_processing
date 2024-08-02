@@ -1,6 +1,14 @@
-<!-- views/meat_processing_views.xml -->
 <odoo>
     <data>
+        <!-- Action definition -->
+        <record id="action_meat_processing_orders" model="ir.actions.act_window">
+            <field name="name">Órdenes de Procesamiento de Carne</field>
+            <field name="res_model">meat.processing.order</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_meat_processing_order_tree"/>
+        </record>
+
+        <!-- Tree view definition -->
         <record id="view_meat_processing_order_tree" model="ir.ui.view">
             <field name="name">meat.processing.order.tree</field>
             <field name="model">meat.processing.order</field>
@@ -14,6 +22,7 @@
             </field>
         </record>
 
+        <!-- Form view definition -->
         <record id="view_meat_processing_order_form" model="ir.ui.view">
             <field name="name">meat.processing.order.form</field>
             <field name="model">meat.processing.order</field>
@@ -43,13 +52,6 @@
                     </sheet>
                 </form>
             </field>
-        </record>
-
-        <record id="action_meat_processing_orders" model="ir.actions.act_window">
-            <field name="name">Órdenes de Procesamiento de Carne</field>
-            <field name="res_model">meat.processing.order</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_meat_processing_order_tree"/>
         </record>
     </data>
 </odoo>
