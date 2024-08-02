@@ -1,6 +1,32 @@
 <odoo>
     <data>
-        <!-- Action definition -->
+        <!-- Definición de la vista tree simplificada -->
+        <record id="view_meat_processing_order_tree" model="ir.ui.view">
+            <field name="name">meat.processing.order.tree</field>
+            <field name="model">meat.processing.order</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Definición de la vista form simplificada -->
+        <record id="view_meat_processing_order_form" model="ir.ui.view">
+            <field name="name">meat.processing.order.form</field>
+            <field name="model">meat.processing.order</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Acción que usa la vista tree y form -->
         <record id="action_meat_processing_orders" model="ir.actions.act_window">
             <field name="name">Órdenes de Procesamiento de Carne</field>
             <field name="res_model">meat.processing.order</field>
@@ -8,50 +34,5 @@
             <field name="view_id" ref="view_meat_processing_order_tree"/>
         </record>
 
-        <!-- Tree view definition -->
-        <record id="view_meat_processing_order_tree" model="ir.ui.view">
-            <field name="name">meat.processing.order.tree</field>
-            <field name="model">meat.processing.order</field>
-            <field name="arch" type="xml">
-                <tree string="Órdenes de Procesamiento de Carne">
-                    <field name="name"/>
-                    <field name="date"/>
-                    <field name="product_id"/>
-                    <field name="state"/>
-                </tree>
-            </field>
-        </record>
-
-        <!-- Form view definition -->
-        <record id="view_meat_processing_order_form" model="ir.ui.view">
-            <field name="name">meat.processing.order.form</field>
-            <field name="model">meat.processing.order</field>
-            <field name="arch" type="xml">
-                <form string="Orden de Procesamiento de Carne">
-                    <sheet>
-                        <group>
-                            <field name="name"/>
-                            <field name="date"/>
-                            <field name="product_id"/>
-                            <field name="state"/>
-                        </group>
-                        <group>
-                            <field name="line_ids" context="{'default_order_id': active_id}">
-                                <tree string="Líneas de Orden">
-                                    <field name="product_id"/>
-                                    <field name="quantity"/>
-                                </tree>
-                            </field>
-                        </group>
-                        <footer>
-                            <button string="Iniciar Despiece" type="object" name="action_start_processing" class="oe_highlight" states="draft"/>
-                            <button string="Completado" type="object" name="action_done" class="oe_highlight" states="processing"/>
-                            <button string="Cancelar" type="object" name="action_cancel" class="oe_highlight" states="draft,processing"/>
-                            <button string="Restablecer a Borrador" type="object" name="action_draft" class="oe_highlight" states="cancel"/>
-                        </footer>
-                    </sheet>
-                </form>
-            </field>
-        </record>
     </data>
 </odoo>
