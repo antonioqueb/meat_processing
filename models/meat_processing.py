@@ -36,6 +36,7 @@ class MeatProcessingOrder(models.Model):
 
 
 
+
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
     _description = 'Meat Processing Order Line'
