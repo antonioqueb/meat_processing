@@ -43,6 +43,7 @@ class MeatProcessingOrder(models.Model):
                     'product_id': line.product_id.id,
                     'location_id': stock_quant.location_id.id,
                     'quantity': line.quantity,
+                    'uom_id': self.env.ref('uom.product_uom_kgm').id,  # Unidad de medida en kg
                 })
 
     def action_cancel(self):
@@ -62,6 +63,7 @@ class MeatProcessingOrderLine(models.Model):
     quantity = fields.Float(string='Cantidad', required=True)
     unit_price = fields.Float(string='Precio Unitario', required=True)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
+    uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
 
     @api.depends('quantity', 'unit_price')
     def _compute_subtotal(self):
