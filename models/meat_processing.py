@@ -3,20 +3,20 @@ from odoo.exceptions import UserError
 
 class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
-    _description = 'Meat Processing Order'
+    _description = 'Orden de Procesamiento de Carne'
 
-    name = fields.Char(string='Order Name', required=True, default=lambda self: _('New'))
-    order_date = fields.Date(string='Order Date', required=True)
-    customer_id = fields.Many2one('res.partner', string='Customer', required=True)
-    order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Order Lines')
+    name = fields.Char(string='Nombre de la Orden', required=True, default=lambda self: _('Nuevo'))
+    order_date = fields.Date(string='Fecha de la Orden', required=True)
+    customer_id = fields.Many2one('res.partner', string='Cliente', required=True)
+    order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden')
     state = fields.Selection([
-        ('draft', 'Draft'),
-        ('confirmed', 'Confirmed'),
-        ('done', 'Done'),
-        ('cancelled', 'Cancelled')
-    ], string='Status', default='draft')
-    total_amount = fields.Float(string='Total Amount', compute='_compute_total_amount', store=True)
-    notes = fields.Text(string='Notes')
+        ('draft', 'Borrador'),
+        ('confirmed', 'Confirmado'),
+        ('done', 'Hecho'),
+        ('cancelled', 'Cancelado')
+    ], string='Estado', default='draft')
+    total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
+    notes = fields.Text(string='Notas')
 
     @api.depends('order_line_ids.subtotal')
     def _compute_total_amount(self):
@@ -38,13 +38,13 @@ class MeatProcessingOrder(models.Model):
 
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
-    _description = 'Meat Processing Order Line'
+    _description = 'Línea de Orden de Procesamiento de Carne'
 
-    name = fields.Char(string='Order Line Name')
-    order_id = fields.Many2one('meat.processing.order', string='Order', required=True)
-    product_id = fields.Many2one('product.product', string='Product', required=True)
-    quantity = fields.Float(string='Quantity', required=True)
-    unit_price = fields.Float(string='Unit Price', required=True)
+    name = fields.Char(string='Nombre de la Línea de Orden')
+    order_id = fields.Many2one('meat.processing.order', string='Orden', required=True)
+    product_id = fields.Many2one('product.product', string='Producto', required=True)
+    quantity = fields.Float(string='Cantidad', required=True)
+    unit_price = fields.Float(string='Precio Unitario', required=True)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
 
     @api.depends('quantity', 'unit_price')
