@@ -1,6 +1,4 @@
-from odoo import api,models, fields
-
-
+from odoo import models, fields, api
 
 class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
@@ -23,6 +21,19 @@ class MeatProcessingOrder(models.Model):
     def _compute_total_amount(self):
         for order in self:
             order.total_amount = sum(line.subtotal for line in order.order_line_ids)
+
+    def action_confirm(self):
+        self.state = 'confirmed'
+
+    def action_done(self):
+        self.state = 'done'
+
+    def action_cancel(self):
+        self.state = 'cancelled'
+
+    def action_set_to_draft(self):
+        self.state = 'draft'
+
 
 
 class MeatProcessingOrderLine(models.Model):
