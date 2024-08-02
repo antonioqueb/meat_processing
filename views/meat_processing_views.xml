@@ -65,9 +65,6 @@
                                     <field name="name"/>
                                 </strong>
                                 <div>
-                                    <field name="customer_id"/>
-                                </div>
-                                <div>
                                     <field name="order_date"/>
                                 </div>
                                 <div>
@@ -90,7 +87,6 @@
             <field name="arch" type="xml">
                 <calendar string="Órdenes de Despiece" date_start="order_date">
                     <field name="name"/>
-                    <field name="customer_id"/>
                 </calendar>
             </field>
         </record>
@@ -114,7 +110,6 @@
             <field name="arch" type="xml">
                 <search string="Buscar Órdenes de Despiece">
                     <field name="name"/>
-                    <field name="customer_id"/>
                     <field name="order_date"/>
                     <field name="state"/>
                     <field name="total_amount"/>
