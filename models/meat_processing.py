@@ -16,6 +16,13 @@ class MeatProcessingOrder(models.Model):
         ('done', 'Done'),
         ('cancelled', 'Cancelled')
     ], string='Status', default='draft')
+    total_amount = fields.Float(string='Total Amount', compute='_compute_total_amount', store=True)
+    notes = fields.Text(string='Notes')
+
+    @api.depends('order_line_ids.subtotal')
+    def _compute_total_amount(self):
+        for order in self:
+            order.total_amount = sum(line.subtotal for line in order.order_line_ids)
 
 
 class MeatProcessingOrderLine(models.Model):
