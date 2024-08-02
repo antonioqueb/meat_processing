@@ -1,4 +1,3 @@
-# meat_processing/models/meat_processing.py
 from odoo import models, fields, api, _
 
 class OrdenProcesamientoCarne(models.Model):

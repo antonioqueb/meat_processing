@@ -6,7 +6,7 @@
     'sequence': -100,
     'description': """Gestiona el procesamiento y despiece de canales de res y pollo.""",
     'category': 'Manufacturing',
-    'author': 'Tu Nombre',
+    'author': 'Alphaqueb Consulting S.A.S',
     'website': 'http://www.tuwebsite.com',
     'depends': ['base', 'mrp', 'stock'],
     'data': [
