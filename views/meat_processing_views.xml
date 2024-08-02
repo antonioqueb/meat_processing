@@ -1,17 +1,20 @@
 <odoo>
     <data>
-        <!-- Definición de la vista tree simplificada -->
+        <!-- Definición de la vista tree -->
         <record id="view_meat_processing_order_tree" model="ir.ui.view">
             <field name="name">meat.processing.order.tree</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
                 <tree>
                     <field name="name"/>
+                    <field name="order_date"/>
+                    <field name="customer_id"/>
+                    <field name="state"/>
                 </tree>
             </field>
         </record>
 
-        <!-- Definición de la vista form simplificada -->
+        <!-- Definición de la vista form -->
         <record id="view_meat_processing_order_form" model="ir.ui.view">
             <field name="name">meat.processing.order.form</field>
             <field name="model">meat.processing.order</field>
@@ -20,18 +23,26 @@
                     <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="order_date"/>
+                            <field name="customer_id"/>
+                            <field name="state"/>
                         </group>
+                        <notebook>
+                            <page string="Order Lines">
+                                <field name="order_line_ids">
+                                    <tree editable="bottom">
+                                        <field name="name"/>
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                        <field name="unit_price"/>
+                                        <field name="subtotal"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
                     </sheet>
                 </form>
             </field>
-        </record>
-
-        <!-- Acción que usa la vista tree y form -->
-        <record id="action_meat_processing_orders" model="ir.actions.act_window">
-            <field name="name">Órdenes de Procesamiento de Carne</field>
-            <field name="res_model">meat.processing.order</field>
-            <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_meat_processing_order_tree"/>
         </record>
     </data>
 </odoo>
