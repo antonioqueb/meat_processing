@@ -1,4 +1,6 @@
+# models/meat_processing.py
 from odoo import models, fields, api, _
+from odoo.exceptions import UserError
 
 class OrdenProcesamientoCarne(models.Model):
     _name = 'meat.processing.order'
@@ -17,22 +19,39 @@ class OrdenProcesamientoCarne(models.Model):
 
     @api.model
     def create(self, vals):
+        # Validar existencia de orden con el mismo nombre
+        if self.search([('name', '=', vals.get('name'))]):
+            raise UserError(_('Ya existe una orden con el mismo nombre.'))
         if vals.get('name', _('Nuevo')) == _('Nuevo'):
             vals['name'] = self.env['ir.sequence'].next_by_code('meat.processing.order') or _('Nuevo')
-        result = super(OrdenProcesamientoCarne, self).create(vals)
-        return result
+        return super(OrdenProcesamientoCarne, self).create(vals)
 
     def action_start_processing(self):
+        self.ensure_one()
+        if self.state != 'draft':
+            raise UserError(_('Solo se pueden procesar órdenes en estado borrador.'))
         self.state = 'processing'
         self._create_production_order()
 
     def action_done(self):
+        self.ensure_one()
+        if self.state != 'processing':
+            raise UserError(_('Solo se pueden completar órdenes en estado de procesamiento.'))
         self.state = 'done'
         self._mark_production_done()
 
     def action_cancel(self):
+        self.ensure_one()
+        if self.state not in ('draft', 'processing'):
+            raise UserError(_('Solo se pueden cancelar órdenes en estado borrador o en proceso.'))
         self.state = 'cancel'
         self._cancel_production_order()
+
+    def action_draft(self):
+        self.ensure_one()
+        if self.state != 'cancel':
+            raise UserError(_('Solo se pueden restablecer órdenes canceladas a borrador.'))
+        self.state = 'draft'
 
     def _create_production_order(self):
         production_obj = self.env['mrp.production']
@@ -66,6 +85,12 @@ class OrdenProcesamientoCarne(models.Model):
             productions = self.env['mrp.production'].search([('origin', '=', order.name)])
             for production in productions:
                 production.button_mark_done()
+                # Reduce stock de canal y aumentar stock de productos despiece
+                self._update_inventory(production)
+
+    def _update_inventory(self, production):
+        # Lógica para ajustar inventario según los productos obtenidos del despiece
+        pass
 
     def _cancel_production_order(self):
         for order in self:

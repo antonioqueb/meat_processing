@@ -1,3 +1,4 @@
+<!-- views/meat_processing_views.xml -->
 <odoo>
     <data>
         <record id="view_meat_processing_order_tree" model="ir.ui.view">
@@ -37,7 +38,7 @@
                             <button string="Iniciar Despiece" type="object" name="action_start_processing" class="oe_highlight" states="draft"/>
                             <button string="Completado" type="object" name="action_done" class="oe_highlight" states="processing"/>
                             <button string="Cancelar" type="object" name="action_cancel" class="oe_highlight" states="draft,processing"/>
-                            <button string="Restablecer a Borrador" type="object" name="action_draft" class="oe_highlight" states="cancel,done"/>
+                            <button string="Restablecer a Borrador" type="object" name="action_draft" class="oe_highlight" states="cancel"/>
                         </footer>
                     </sheet>
                 </form>
