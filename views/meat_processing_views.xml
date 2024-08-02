@@ -51,11 +51,22 @@
             </field>
         </record>
 
+        <!-- Acción para las Órdenes de Procesamiento de Carne -->
         <record id="action_meat_processing_orders" model="ir.actions.act_window">
             <field name="name">Meat Processing Orders</field>
             <field name="res_model">meat.processing.order</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_meat_processing_order_tree"/>
+        </record>
+
+        <!-- Acción para el Reporte de Órdenes de Procesamiento de Carne -->
+        <record id="action_report_meat_processing_order" model="ir.actions.report">
+            <field name="name">Reporte de Órdenes de Procesamiento de Carne</field>
+            <field name="model">meat.processing.order</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">meat_processing.report_meat_processing_order</field>
+            <field name="report_file">meat_processing.report_meat_processing_order</field>
+            <field name="print_report_name">Reporte de Órdenes de Procesamiento</field>
         </record>
     </data>
 </odoo>
