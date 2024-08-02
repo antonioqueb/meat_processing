@@ -2,5 +2,7 @@
     <data>
         <menuitem id="menu_meat_processing_root" name="Procesamiento de Carne" sequence="10"/>
         <menuitem id="menu_meat_processing_orders" name="Órdenes de Procesamiento" parent="menu_meat_processing_root" action="action_meat_processing_orders"/>
+        <menuitem id="menu_meat_processing_reports" name="Reportes" parent="menu_meat_processing_root" sequence="20"/>
+        <menuitem id="menu_meat_processing_order_report" name="Reporte de Órdenes" parent="menu_meat_processing_reports" action="action_report_meat_processing_order"/>
     </data>
 </odoo>

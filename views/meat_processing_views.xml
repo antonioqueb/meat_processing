@@ -29,7 +29,7 @@
                             <field name="notes"/>
                         </group>
                         <group>
-                            <field name="order_line_ids" context="{'default_order_id': active_id}">
+                            <field name="order_line_ids">
                                 <tree string="Order Lines">
                                     <field name="product_id"/>
                                     <field name="quantity"/>
@@ -39,10 +39,10 @@
                             </field>
                         </group>
                         <footer>
-                            <button string="Confirm" type="object" name="action_confirm" class="oe_highlight" states="draft"/>
-                            <button string="Done" type="object" name="action_done" class="oe_highlight" states="confirmed"/>
-                            <button string="Cancel" type="object" name="action_cancel" class="oe_highlight" states="draft,confirmed"/>
-                            <button string="Set to Draft" type="object" name="action_set_to_draft" class="oe_highlight" states="cancelled"/>
+                            <button string="Confirm" type="object" name="action_confirm" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                            <button string="Done" type="object" name="action_done" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'confirmed')]}"/>
+                            <button string="Cancel" type="object" name="action_cancel" class="oe_highlight" attrs="{'invisible': [('state', 'not in', ['draft', 'confirmed'])]}"/>
+                            <button string="Set to Draft" type="object" name="action_set_to_draft" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
                         </footer>
                     </sheet>
                 </form>

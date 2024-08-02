@@ -1,49 +1,57 @@
 <odoo>
+    <template id="report_meat_processing_order_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="meat_processing.report_meat_processing_order">
+                    <t t-set="doc" t-value="o"/>
+                </t>
+            </t>
+        </t>
+    </template>
+
     <template id="report_meat_processing_order">
-        <t t-call="web.basic_layout">
+        <t t-call="web.external_layout">
             <div class="page">
-                <h2>Meat Processing Order</h2>
-                <table class="table table-sm table-hover">
-                    <tr>
-                        <th>Reference</th>
-                        <td><span t-field="o.name"/></td>
-                    </tr>
-                    <tr>
-                        <th>Date</th>
-                        <td><span t-field="o.order_date"/></td>
-                    </tr>
-                    <tr>
-                        <th>Customer</th>
-                        <td><span t-field="o.customer_id"/></td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td><span t-field="o.state"/></td>
-                    </tr>
-                    <tr>
-                        <th>Total Amount</th>
-                        <td><span t-field="o.total_amount"/></td>
-                    </tr>
-                </table>
-                <h3>Order Lines</h3>
-                <table class="table table-sm table-hover">
+                <h2>Orden de Procesamiento de Carne</h2>
+                <table class="table table-sm o_main_table">
                     <thead>
                         <tr>
-                            <th>Product</th>
-                            <th>Quantity</th>
-                            <th>Unit Price</th>
+                            <th>Referencia</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span t-field="doc.name"/></td>
+                            <td><span t-field="doc.order_date"/></td>
+                            <td><span t-field="doc.customer_id.name"/></td>
+                            <td><span t-field="doc.state"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3>Lineas de la Orden</h3>
+                <table class="table table-sm o_main_table">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
                             <th>Subtotal</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr t-foreach="o.order_line_ids" t-as="line">
-                            <td><span t-field="line.product_id"/></td>
+                        <tr t-foreach="doc.order_line_ids" t-as="line">
+                            <td><span t-field="line.product_id.name"/></td>
                             <td><span t-field="line.quantity"/></td>
                             <td><span t-field="line.unit_price"/></td>
                             <td><span t-field="line.subtotal"/></td>
                         </tr>
                     </tbody>
                 </table>
+                <h3>Total: <span t-field="doc.total_amount"/></h3>
+                <p>Notas: <span t-field="doc.notes"/></p>
             </div>
         </t>
     </template>
