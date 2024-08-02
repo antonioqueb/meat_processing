@@ -19,7 +19,6 @@ class OrdenProcesamientoCarne(models.Model):
 
     @api.model
     def create(self, vals):
-        # Validar existencia de orden con el mismo nombre
         if self.search([('name', '=', vals.get('name'))]):
             raise UserError(_('Ya existe una orden con el mismo nombre.'))
         if vals.get('name', _('Nuevo')) == _('Nuevo'):
@@ -85,7 +84,6 @@ class OrdenProcesamientoCarne(models.Model):
             productions = self.env['mrp.production'].search([('origin', '=', order.name)])
             for production in productions:
                 production.button_mark_done()
-                # Reduce stock de canal y aumentar stock de productos despiece
                 self._update_inventory(production)
 
     def _update_inventory(self, production):
