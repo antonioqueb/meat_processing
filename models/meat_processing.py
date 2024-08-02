@@ -32,18 +32,16 @@ class MeatProcessingOrder(models.Model):
             if order.state != 'processing':
                 raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
             order.state = 'done'
-            # Eliminar las canales del inventario
             for product in order.product_ids:
                 stock_quant = self.env['stock.quant'].search([('product_id', '=', product.id)], limit=1)
                 if stock_quant:
                     stock_quant.sudo().unlink()
-            # Crear los productos resultantes del despiece
             for line in order.order_line_ids:
                 self.env['stock.quant'].create({
                     'product_id': line.product_id.id,
                     'location_id': stock_quant.location_id.id,
                     'quantity': line.quantity,
-                    'uom_id': self.env.ref('uom.product_uom_kgm').id,  # Unidad de medida en kg
+                    'uom_id': self.env.ref('uom.product_uom_kgm').id,
                 })
 
     def action_cancel(self):
