@@ -1,3 +1,4 @@
+# meat_processing/__manifest__.py
 {
     'name': 'Procesamiento de Carne',
     'version': '1.0',
@@ -10,10 +11,10 @@
     'depends': ['base', 'mrp', 'stock'],
     'data': [
         'security/ir.model.access.csv',
-        'views/meat_processing_views.xml',  # Ensure this is loaded first
-        'views/meat_processing_menu.xml',  # Then load the menu
-        'views/report_meat_processing_order.xml',  # Add the report template
-        'views/report.xml',  # Add the report definition
+        'views/meat_processing_menu.xml',
+        'views/meat_processing_views.xml',
+        'views/report.xml',  # Añadido para los reportes
+        'views/report_meat_processing_order.xml',  # Añadido para los reportes
     ],
     'installable': True,
     'application': True,

@@ -1,11 +1,10 @@
 <odoo>
     <data>
-        <!-- Definición de la vista tree -->
         <record id="view_meat_processing_order_tree" model="ir.ui.view">
             <field name="name">meat.processing.order.tree</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
-                <tree>
+                <tree string="Meat Processing Orders">
                     <field name="name"/>
                     <field name="order_date"/>
                     <field name="customer_id"/>
@@ -15,48 +14,43 @@
             </field>
         </record>
 
-        <!-- Definición de la vista form -->
         <record id="view_meat_processing_order_form" model="ir.ui.view">
             <field name="name">meat.processing.order.form</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
-                <form>
-                    <header>
-                        <button name="action_confirm" type="object" string="Confirm" class="btn-primary" context="{'state':'draft'}"/>
-                        <button name="action_done" type="object" string="Done" class="btn-success" context="{'state':'confirmed'}"/>
-                        <button name="action_cancel" type="object" string="Cancel" class="btn-danger" context="{'state':'draft,confirmed'}"/>
-                        <button name="action_set_to_draft" type="object" string="Set to Draft" class="btn-secondary" context="{'state':'cancelled'}"/>
-                    </header>
+                <form string="Meat Processing Order">
                     <sheet>
                         <group>
                             <field name="name"/>
                             <field name="order_date"/>
                             <field name="customer_id"/>
-                            <field name="state"/>
+                            <field name="state" readonly="1"/>
                             <field name="total_amount" readonly="1"/>
                             <field name="notes"/>
                         </group>
-                        <notebook>
-                            <page string="Order Lines">
-                                <field name="order_line_ids">
-                                    <tree editable="bottom">
-                                        <field name="name"/>
-                                        <field name="product_id"/>
-                                        <field name="quantity"/>
-                                        <field name="unit_price"/>
-                                        <field name="subtotal"/>
-                                    </tree>
-                                </field>
-                            </page>
-                        </notebook>
+                        <group>
+                            <field name="order_line_ids" context="{'default_order_id': active_id}">
+                                <tree string="Order Lines">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="unit_price"/>
+                                    <field name="subtotal" readonly="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <footer>
+                            <button string="Confirm" type="object" name="action_confirm" class="oe_highlight" states="draft"/>
+                            <button string="Done" type="object" name="action_done" class="oe_highlight" states="confirmed"/>
+                            <button string="Cancel" type="object" name="action_cancel" class="oe_highlight" states="draft,confirmed"/>
+                            <button string="Set to Draft" type="object" name="action_set_to_draft" class="oe_highlight" states="cancelled"/>
+                        </footer>
                     </sheet>
                 </form>
             </field>
         </record>
 
-        <!-- Definición de la acción -->
         <record id="action_meat_processing_orders" model="ir.actions.act_window">
-            <field name="name">Órdenes de Procesamiento de Carne</field>
+            <field name="name">Meat Processing Orders</field>
             <field name="res_model">meat.processing.order</field>
             <field name="view_mode">tree,form</field>
             <field name="view_id" ref="view_meat_processing_order_tree"/>
