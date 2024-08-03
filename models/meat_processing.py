@@ -9,6 +9,8 @@ class MeatProcessingOrder(models.Model):
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
     total_kilos = fields.Float(string='Total Kilos', required=True)
+    processed_kilos = fields.Float(string='Kilos Procesados', compute='_compute_processed_kilos', store=True)
+    remaining_kilos = fields.Float(string='Kilos Restantes', compute='_compute_remaining_kilos', store=True)
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('processing', 'En Proceso'),
@@ -24,6 +26,16 @@ class MeatProcessingOrder(models.Model):
     can_done = fields.Boolean(string='Puede Finalizar', compute='_compute_can_done')
     can_cancel = fields.Boolean(string='Puede Cancelar', compute='_compute_can_cancel')
     can_set_to_draft = fields.Boolean(string='Puede Restablecer a Borrador', compute='_compute_can_set_to_draft')
+
+    @api.depends('order_line_ids.quantity')
+    def _compute_processed_kilos(self):
+        for order in self:
+            order.processed_kilos = sum(line.quantity for line in order.order_line_ids)
+
+    @api.depends('total_kilos', 'processed_kilos')
+    def _compute_remaining_kilos(self):
+        for order in self:
+            order.remaining_kilos = order.total_kilos - order.processed_kilos
 
     @api.depends('order_line_ids.subtotal')
     def _compute_total_amount(self):
@@ -69,6 +81,19 @@ class MeatProcessingOrder(models.Model):
                 'location_id': stock_quants and stock_quants[0].location_id.id or self.env.ref('stock.stock_location_stock').id,
                 'quantity': line.quantity,
                 'uom_id': self.env.ref('uom.product_uom_kgm').id,
+            })
+        # Detonamos una orden de producción
+        self._create_production_order()
+
+    def _create_production_order(self):
+        for order in self:
+            self.env['mrp.production'].create({
+                'name': order.name,
+                'product_id': order.product_ids.id,
+                'product_qty': order.total_kilos,
+                'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
+                'origin': order.name,
+                'date_planned_start': fields.Datetime.now(),
             })
 
     def action_cancel(self):

@@ -10,6 +10,8 @@
                     <field name="order_date"/>
                     <field name="product_ids"/>
                     <field name="total_kilos"/>
+                    <field name="processed_kilos"/>
+                    <field name="remaining_kilos"/>
                     <field name="state"/>
                     <field name="total_amount"/>
                     <field name="notes"/>
@@ -35,9 +37,11 @@
                             <field name="order_date"/>
                             <field name="product_ids" widget="many2many_tags"/>
                             <field name="total_kilos"/>
+                            <field name="processed_kilos" readonly="1"/>
+                            <field name="remaining_kilos" readonly="1"/>
                             <field name="state" readonly="1"/>
                             <field name="total_amount" readonly="1"/>
-                            <field name="notes" readonly="state == 'done'"/>
+                            <field name="notes"/>
                         </group>
                         <group>
                             <field name="order_line_ids">
@@ -75,6 +79,12 @@
                                 </div>
                                 <div>
                                     <field name="total_kilos"/>
+                                </div>
+                                <div>
+                                    <field name="processed_kilos"/>
+                                </div>
+                                <div>
+                                    <field name="remaining_kilos"/>
                                 </div>
                                 <div>
                                     <field name="state"/>
@@ -119,6 +129,8 @@
                     <field name="order_date"/>
                     <field name="state"/>
                     <field name="total_kilos"/>
+                    <field name="processed_kilos"/>
+                    <field name="remaining_kilos"/>
                     <field name="total_amount"/>
                 </search>
             </field>
