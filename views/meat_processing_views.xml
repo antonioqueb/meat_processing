@@ -132,5 +132,12 @@
             <field name="view_id" ref="view_meat_processing_order_tree"/>
             <field name="search_view_id" ref="view_meat_processing_order_search"/>
         </record>
+
+        <!-- Carga del archivo CSS personalizado -->
+        <template id="assets_backend" name="meat_processing assets" inherit_id="web.assets_backend">
+            <xpath expr="." position="inside">
+                <link rel="stylesheet" type="text/css" href="/meat_processing/static/src/css/meat_processing_styles.css"/>
+            </xpath>
+        </template>
     </data>
 </odoo>
