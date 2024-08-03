@@ -87,7 +87,7 @@ class MeatProcessingOrder(models.Model):
                     'product_uom': product.uom_id.id,
                     'location_id': location_src_id,
                     'location_dest_id': location_dest_id,
-                    'state': 'draft',
+                    'state': 'confirmed',
                 })
                 move._action_confirm()
                 move._action_assign()
