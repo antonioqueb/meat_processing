@@ -77,7 +77,7 @@ class MeatProcessingOrder(models.Model):
 
     def _create_stock_moves(self):
         location_src_id = self.env.ref('stock.stock_location_stock').id
-        location_dest_id = self.env.ref('stock.stock_location_stock').id
+        location_production_id = self._get_location_production_id()
 
         # Crear movimientos de inventario para los productos procesados
         moves = []
@@ -88,7 +88,7 @@ class MeatProcessingOrder(models.Model):
                 'product_uom_qty': product.weight,
                 'product_uom': product.uom_id.id,
                 'location_id': location_src_id,
-                'location_dest_id': self.env.ref('stock.stock_location_production').id,
+                'location_dest_id': location_production_id,
                 'state': 'draft',
             })
             moves.append(move)
@@ -97,6 +97,18 @@ class MeatProcessingOrder(models.Model):
             move._action_confirm()
             move._action_assign()
             move._action_done()
+
+    def _get_location_production_id(self):
+        # Intenta obtener la ubicación de producción usando diferentes métodos
+        try:
+            return self.env.ref('stock.stock_location_production').id
+        except ValueError:
+            # Si no se encuentra la ubicación por defecto, usa una búsqueda alternativa
+            production_location = self.env['stock.location'].search([('usage', '=', 'production')], limit=1)
+            if production_location:
+                return production_location.id
+            else:
+                raise UserError('No se encontró una ubicación de producción válida en el sistema.')
 
     def _create_production_order(self):
         self.ensure_one()
@@ -107,7 +119,7 @@ class MeatProcessingOrder(models.Model):
             'product_id': self.product_ids[0].id,
             'product_qty': self.total_kilos or 0.0,
             'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
-            'location_src_id': self.env.ref('stock.stock_location_production').id,
+            'location_src_id': self._get_location_production_id(),
             'location_dest_id': self.env.ref('stock.stock_location_stock').id,
             'origin': self.name,
             'state': 'confirmed',
