@@ -128,8 +128,8 @@ class MeatProcessingOrder(models.Model):
                 'product_qty': line.quantity,
                 'product_uom_id': line.uom_id.id,
                 'bom_id': bom.id,
-                'location_src_id': self._get_location_production_id(),
-                'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                'location_src_id': self.env.ref('stock.stock_location_stock').id,  # Asegurar que la ubicación de origen sea WH/Existencias
+                'location_dest_id': self.env.ref('stock.stock_location_production').id,
                 'origin': self.name,
             })
 
