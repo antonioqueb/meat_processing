@@ -19,7 +19,7 @@ class MeatProcessingOrder(models.Model):
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
 
-    # Fields for button visibility
+    # Campos para la visibilidad de los botones
     can_confirm = fields.Boolean(string='Puede Confirmar', compute='_compute_can_confirm')
     can_done = fields.Boolean(string='Puede Finalizar', compute='_compute_can_done')
     can_cancel = fields.Boolean(string='Puede Cancelar', compute='_compute_can_cancel')
