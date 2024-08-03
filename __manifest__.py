@@ -12,12 +12,9 @@
         'security/ir.model.access.csv',
         'views/meat_processing_menu.xml',
         'views/meat_processing_views.xml',
+        'views/meat_processing_assets.xml',
+
     ],
-    'assets': {
-        'web.assets_backend': [
-            'meat_processing/static/src/css/meat_processing_styles.css',
-        ],
-    },
     'installable': True,
     'application': True,
     'auto_install': False,
