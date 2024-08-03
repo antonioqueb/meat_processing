@@ -80,6 +80,7 @@ class MeatProcessingOrder(models.Model):
         location_dest_id = self.env.ref('stock.stock_location_stock').id
 
         # Crear movimientos de inventario para los productos procesados
+        moves = []
         for line in self.order_line_ids:
             move = self.env['stock.move'].create({
                 'name': _('Consumo de %s') % line.product_id.display_name,
@@ -88,8 +89,13 @@ class MeatProcessingOrder(models.Model):
                 'product_uom': line.uom_id.id,
                 'location_id': location_src_id,
                 'location_dest_id': location_dest_id,
-                'state': 'done',
+                'state': 'draft',
             })
+            moves.append(move)
+        
+        for move in moves:
+            move._action_confirm()
+            move._action_assign()
             move._action_done()
 
     def _create_production_order(self):
