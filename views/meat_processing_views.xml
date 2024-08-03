@@ -23,6 +23,12 @@
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
                 <form string="Orden de Despiece">
+                    <header>
+                        <button string="Confirmar" type="object" name="action_confirm" class="btn-primary o_button_state_draft"/>
+                        <button string="Hecho" type="object" name="action_done" class="btn-success o_button_state_processing"/>
+                        <button string="Cancelar" type="object" name="action_cancel" class="btn-danger o_button_state_draft o_button_state_processing"/>
+                        <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary o_button_state_cancelled"/>
+                    </header>
                     <sheet>
                         <group>
                             <field name="name" readonly="1"/>
@@ -44,12 +50,6 @@
                                 </tree>
                             </field>
                         </group>
-                        <footer>
-                            <button string="Confirmar" type="object" name="action_confirm" class="btn-primary o_button_state_draft"/>
-                            <button string="Hecho" type="object" name="action_done" class="btn-success o_button_state_processing"/>
-                            <button string="Cancelar" type="object" name="action_cancel" class="btn-danger o_button_state_draft o_button_state_processing"/>
-                            <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary o_button_state_cancelled"/>
-                        </footer>
                     </sheet>
                 </form>
             </field>
