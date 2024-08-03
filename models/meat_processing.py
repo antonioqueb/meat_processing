@@ -60,13 +60,13 @@ class MeatProcessingOrder(models.Model):
             raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
         self.write({'state': 'done'})
         for product in self.product_ids:
-            stock_quant = self.env['stock.quant'].search([('product_id', '=', product.id)], limit=1)
-            if stock_quant:
-                stock_quant.sudo().unlink()
+            stock_quants = self.env['stock.quant'].search([('product_id', '=', product.id)])
+            if stock_quants:
+                stock_quants.sudo().unlink()
         for line in self.order_line_ids:
             self.env['stock.quant'].create({
                 'product_id': line.product_id.id,
-                'location_id': stock_quant.location_id.id,
+                'location_id': stock_quants and stock_quants[0].location_id.id or self.env.ref('stock.stock_location_stock').id,
                 'quantity': line.quantity,
                 'uom_id': self.env.ref('uom.product_uom_kgm').id,
             })
