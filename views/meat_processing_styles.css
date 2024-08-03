@@ -1,0 +1,33 @@
+/* Añadir este archivo CSS a tu módulo */
+.o_button_state_draft {
+    display: none;
+}
+
+.o_button_state_processing {
+    display: none;
+}
+
+.o_button_state_done {
+    display: none;
+}
+
+.o_button_state_cancelled {
+    display: none;
+}
+
+/* Mostrar los botones según el estado */
+.o_form_view.o_state_draft .o_button_state_draft {
+    display: inline-block;
+}
+
+.o_form_view.o_state_processing .o_button_state_processing {
+    display: inline-block;
+}
+
+.o_form_view.o_state_done .o_button_state_done {
+    display: inline-block;
+}
+
+.o_form_view.o_state_cancelled .o_button_state_cancelled {
+    display: inline-block;
+}
