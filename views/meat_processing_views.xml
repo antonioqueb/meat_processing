@@ -48,6 +48,7 @@
                                 <tree string="Líneas de la Orden">
                                     <field name="product_id"/>
                                     <field name="quantity"/>
+                                    <field name="used_kilos"/>  <!-- Nuevo campo para especificar los kilos utilizados -->
                                     <field name="unit_price"/>
                                     <field name="uom_id"/>
                                     <field name="subtotal"/>

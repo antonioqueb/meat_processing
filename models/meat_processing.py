@@ -125,13 +125,12 @@ class MeatProcessingOrder(models.Model):
             })
 
             # Crear las líneas de BoM con el canal como ingrediente
-            for product in self.product_ids:
-                self.env['mrp.bom.line'].create({
-                    'bom_id': bom.id,
-                    'product_id': product.id,
-                    'product_qty': product.weight,
-                    'product_uom_id': product.uom_id.id,
-                })
+            self.env['mrp.bom.line'].create({
+                'bom_id': bom.id,
+                'product_id': self.product_ids[0].id,
+                'product_qty': line.used_kilos,  # Usar los kilos especificados por el usuario
+                'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
+            })
 
             production = self.env['mrp.production'].create({
                 'product_id': line.product_id.id,
@@ -164,6 +163,7 @@ class MeatProcessingOrderLine(models.Model):
     order_id = fields.Many2one('meat.processing.order', string='Orden', required=True)
     product_id = fields.Many2one('product.product', string='Producto', required=True)
     quantity = fields.Float(string='Cantidad', required=True)
+    used_kilos = fields.Float(string='Kilos Utilizados', required=True)  # Nuevo campo para especificar los kilos utilizados
     unit_price = fields.Float(string='Precio Unitario', required=True)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
