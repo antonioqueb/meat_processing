@@ -46,13 +46,13 @@
                         </group>
                         <footer>
                             <button string="Confirmar" type="object" name="action_confirm" class="btn-primary"
-                                readonly="state != 'draft'"/>
+                                invisible="state != 'draft'"/>
                             <button string="Hecho" type="object" name="action_done" class="btn-success"
-                                readonly="state != 'processing'"/>
+                                invisible="state != 'processing'"/>
                             <button string="Cancelar" type="object" name="action_cancel" class="btn-danger"
-                                readonly="state not in ['draft', 'processing']"/>
+                                invisible="state not in ['draft', 'processing']"/>
                             <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary"
-                                readonly="state != 'cancelled'"/>
+                                invisible="state != 'cancelled'"/>
                         </footer>
                     </sheet>
                 </form>
