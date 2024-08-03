@@ -8,7 +8,7 @@ class MeatProcessingOrder(models.Model):
     name = fields.Char(string='Nombre de la Orden', required=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
-    total_kilos = fields.Float(string='Total Kilos', required=True)
+    total_kilos = fields.Float(string='Total Kilos', required=False)  # Permitir nulo en el modelo
     processed_kilos = fields.Float(string='Kilos Procesados', compute='_compute_processed_kilos', store=True)
     remaining_kilos = fields.Float(string='Kilos Restantes', compute='_compute_remaining_kilos', store=True)
     state = fields.Selection([
@@ -40,7 +40,7 @@ class MeatProcessingOrder(models.Model):
     @api.depends('total_kilos', 'processed_kilos')
     def _compute_remaining_kilos(self):
         for order in self:
-            order.remaining_kilos = order.total_kilos - order.processed_kilos
+            order.remaining_kilos = (order.total_kilos or 0.0) - order.processed_kilos
 
     @api.depends('state')
     def _compute_can_confirm(self):
@@ -85,7 +85,6 @@ class MeatProcessingOrder(models.Model):
                 'product_id': line.product_id.id,
                 'location_id': stock_quant_location_id,
                 'quantity': line.quantity,
-                'uom_id': self.env.ref('uom.product_uom_kgm').id,
             })
 
         self._create_production_order()
@@ -96,35 +95,7 @@ class MeatProcessingOrder(models.Model):
             raise UserError('La orden de procesamiento debe tener al menos un producto.')
         production_vals = {
             'product_id': self.product_ids[0].id,
-            'product_qty': self.total_kilos,
+            'product_qty': self.total_kilos or 0.0,
             'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
-            'location_src_id': self.env.ref('stock.stock_location_stock').id,
-            'location_dest_id': self.env.ref('stock.stock_location_stock').id,
-            'origin': self.name,
         }
         self.env['mrp.production'].create(production_vals)
-
-    def action_cancel(self):
-        self.ensure_one()
-        self.write({'state': 'cancelled'})
-
-    def action_set_to_draft(self):
-        self.ensure_one()
-        self.write({'state': 'draft'})
-
-class MeatProcessingOrderLine(models.Model):
-    _name = 'meat.processing.order.line'
-    _description = 'Línea de Orden de Procesamiento de Carne'
-
-    name = fields.Char(string='Nombre de la Línea de Orden')
-    order_id = fields.Many2one('meat.processing.order', string='Orden', required=True)
-    product_id = fields.Many2one('product.product', string='Producto', required=True)
-    quantity = fields.Float(string='Cantidad', required=True)
-    unit_price = fields.Float(string='Precio Unitario', required=True)
-    subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
-    uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
-
-    @api.depends('quantity', 'unit_price')
-    def _compute_subtotal(self):
-        for line in self:
-            line.subtotal = line.quantity * line.unit_price
