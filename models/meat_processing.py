@@ -9,8 +9,6 @@ class MeatProcessingOrder(models.Model):
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
     total_kilos = fields.Float(string='Total Kilos', required=True)
-    processed_kilos = fields.Float(string='Kilos Procesados', compute='_compute_processed_kilos', store=True)
-    remaining_kilos = fields.Float(string='Kilos Restantes', compute='_compute_remaining_kilos', store=True)
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('processing', 'En Proceso'),
@@ -61,10 +59,14 @@ class MeatProcessingOrder(models.Model):
         if self.state != 'processing':
             raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
         self.write({'state': 'done'})
+
         for product in self.product_ids:
             stock_quants = self.env['stock.quant'].search([('product_id', '=', product.id)])
             if stock_quants:
                 stock_quants.sudo().unlink()
+            else:
+                stock_quants = self.env['stock.quant'].browse([])
+
         for line in self.order_line_ids:
             self.env['stock.quant'].create({
                 'product_id': line.product_id.id,
