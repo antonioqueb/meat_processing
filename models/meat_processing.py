@@ -27,16 +27,6 @@ class MeatProcessingOrder(models.Model):
     can_cancel = fields.Boolean(string='Puede Cancelar', compute='_compute_can_cancel')
     can_set_to_draft = fields.Boolean(string='Puede Restablecer a Borrador', compute='_compute_can_set_to_draft')
 
-    @api.depends('order_line_ids.quantity')
-    def _compute_processed_kilos(self):
-        for order in self:
-            order.processed_kilos = sum(line.quantity for line in order.order_line_ids)
-
-    @api.depends('total_kilos', 'processed_kilos')
-    def _compute_remaining_kilos(self):
-        for order in self:
-            order.remaining_kilos = order.total_kilos - order.processed_kilos
-
     @api.depends('order_line_ids.subtotal')
     def _compute_total_amount(self):
         for order in self:
@@ -82,19 +72,21 @@ class MeatProcessingOrder(models.Model):
                 'quantity': line.quantity,
                 'uom_id': self.env.ref('uom.product_uom_kgm').id,
             })
-        # Detonamos una orden de producción
         self._create_production_order()
 
     def _create_production_order(self):
-        for order in self:
-            self.env['mrp.production'].create({
-                'name': order.name,
-                'product_id': order.product_ids.id,
-                'product_qty': order.total_kilos,
-                'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
-                'origin': order.name,
-                'date_planned_start': fields.Datetime.now(),
-            })
+        self.ensure_one()
+        production_vals = {
+            'product_id': self.product_ids[0].id,
+            'product_qty': self.total_kilos,
+            'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
+            'location_src_id': self.env.ref('stock.stock_location_stock').id,
+            'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+            'origin': self.name,
+            # Eliminar o ajustar el campo date_planned_start si es necesario
+            # 'date_planned_start': fields.Datetime.now(),
+        }
+        self.env['mrp.production'].create(production_vals)
 
     def action_cancel(self):
         self.ensure_one()
