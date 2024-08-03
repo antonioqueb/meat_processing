@@ -44,21 +44,11 @@
                                 </tree>
                             </field>
                         </group>
-                        <group>
-                            <field name="can_confirm" invisible="1"/>
-                            <field name="can_done" invisible="1"/>
-                            <field name="can_cancel" invisible="1"/>
-                            <field name="can_set_to_draft" invisible="1"/>
-                        </group>
                         <footer>
-                            <button string="Confirmar" type="object" name="action_confirm" class="btn-primary"
-                                modifiers="{'invisible': [('can_confirm', '=', False)]}"/>
-                            <button string="Hecho" type="object" name="action_done" class="btn-success"
-                                modifiers="{'invisible': [('can_done', '=', False)]}"/>
-                            <button string="Cancelar" type="object" name="action_cancel" class="btn-danger"
-                                modifiers="{'invisible': [('can_cancel', '=', False)]}"/>
-                            <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary"
-                                modifiers="{'invisible': [('can_set_to_draft', '=', False)]}"/>
+                            <button string="Confirmar" type="object" name="action_confirm" class="btn-primary o_button_state_draft"/>
+                            <button string="Hecho" type="object" name="action_done" class="btn-success o_button_state_processing"/>
+                            <button string="Cancelar" type="object" name="action_cancel" class="btn-danger o_button_state_draft o_button_state_processing"/>
+                            <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary o_button_state_cancelled"/>
                         </footer>
                     </sheet>
                 </form>
