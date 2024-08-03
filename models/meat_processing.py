@@ -86,35 +86,35 @@ class MeatProcessingOrder(models.Model):
         if not self.product_ids:
             raise UserError('La orden de procesamiento debe tener al menos un producto.')
 
-        bom = self.env['mrp.bom'].create({
-            'product_tmpl_id': self.product_ids[0].product_tmpl_id.id,
-            'product_qty': self.total_kilos or 0.0,
-            'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
-            'type': 'normal',
-        })
-
         for line in self.order_line_ids:
+            bom = self.env['mrp.bom'].create({
+                'product_tmpl_id': line.product_id.product_tmpl_id.id,
+                'product_qty': line.quantity,
+                'product_uom_id': line.uom_id.id,
+                'type': 'normal',
+            })
+
             self.env['mrp.bom.line'].create({
                 'bom_id': bom.id,
+                'product_id': self.product_ids[0].id,
+                'product_qty': self.total_kilos or 0.0,
+                'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
+            })
+
+            production = self.env['mrp.production'].create({
                 'product_id': line.product_id.id,
                 'product_qty': line.quantity,
                 'product_uom_id': line.uom_id.id,
+                'bom_id': bom.id,
+                'location_src_id': self._get_location_production_id(),
+                'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                'origin': self.name,
             })
 
-        production = self.env['mrp.production'].create({
-            'product_id': self.product_ids[0].id,
-            'product_qty': self.total_kilos or 0.0,
-            'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
-            'bom_id': bom.id,
-            'location_src_id': self._get_location_production_id(),
-            'location_dest_id': self.env.ref('stock.stock_location_stock').id,
-            'origin': self.name,
-        })
-
-        production.action_confirm()
-        production.action_assign()
-        production.button_plan()
-        production.button_mark_done()
+            production.action_confirm()
+            production.action_assign()
+            production.button_plan()
+            production.button_mark_done()
 
     def action_cancel(self):
         self.ensure_one()
