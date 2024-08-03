@@ -25,34 +25,34 @@
                 <form string="Orden de Despiece">
                     <sheet>
                         <group>
-                            <field name="name"/>
-                            <field name="order_date"/>
-                            <field name="product_ids" widget="many2many_tags"/>
-                            <field name="total_kilos"/>
+                            <field name="name" readonly="1"/>
+                            <field name="order_date" readonly="state not in ['draft']"/>
+                            <field name="product_ids" widget="many2many_tags" readonly="state not in ['draft']"/>
+                            <field name="total_kilos" readonly="state not in ['draft']"/>
                             <field name="state" readonly="1"/>
                             <field name="total_amount" readonly="1"/>
-                            <field name="notes"/>
+                            <field name="notes" readonly="state in ['done']"/>
                         </group>
                         <group>
-                            <field name="order_line_ids">
+                            <field name="order_line_ids" readonly="state not in ['draft', 'processing']">
                                 <tree string="Líneas de la Orden">
-                                    <field name="product_id"/>
-                                    <field name="quantity"/>
-                                    <field name="unit_price"/>
-                                    <field name="uom_id"/>
+                                    <field name="product_id" readonly="1"/>
+                                    <field name="quantity" readonly="1"/>
+                                    <field name="unit_price" readonly="1"/>
+                                    <field name="uom_id" readonly="1"/>
                                     <field name="subtotal" readonly="1"/>
                                 </tree>
                             </field>
                         </group>
                         <footer>
                             <button string="Confirmar" type="object" name="action_confirm" class="btn-primary"
-                                modifiers="{'invisible': [('state', '!=', 'draft')]}"/>
+                                readonly="state not in ['draft']"/>
                             <button string="Hecho" type="object" name="action_done" class="btn-success"
-                                modifiers="{'invisible': [('state', '!=', 'processing')]}"/>
+                                readonly="state not in ['processing']"/>
                             <button string="Cancelar" type="object" name="action_cancel" class="btn-danger"
-                                modifiers="{'invisible': [('state', 'not in', ['draft','processing'])]}"/>
+                                readonly="state not in ['draft','processing']"/>
                             <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary"
-                                modifiers="{'invisible': [('state', '!=', 'cancelled')]}"/>
+                                readonly="state not in ['cancelled']"/>
                         </footer>
                     </sheet>
                 </form>
