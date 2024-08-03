@@ -7,7 +7,7 @@
     'category': 'Manufacturing',
     'author': 'Alphaqueb Consulting S.A.S',
     'website': 'http://www.tuwebsite.com',
-    'depends': ['base', 'mrp', 'stock'],
+    'depends': ['base', 'mrp', 'stock', 'web'],
     'data': [
         'security/ir.model.access.csv',
         'views/meat_processing_menu.xml',
