@@ -81,14 +81,14 @@ class MeatProcessingOrder(models.Model):
 
         # Crear movimientos de inventario para los productos procesados
         moves = []
-        for line in self.order_line_ids:
+        for product in self.product_ids:
             move = self.env['stock.move'].create({
-                'name': _('Consumo de %s') % line.product_id.display_name,
-                'product_id': line.product_id.id,
-                'product_uom_qty': line.quantity,
-                'product_uom': line.uom_id.id,
+                'name': _('Consumo de %s') % product.display_name,
+                'product_id': product.id,
+                'product_uom_qty': product.weight,
+                'product_uom': product.uom_id.id,
                 'location_id': location_src_id,
-                'location_dest_id': location_dest_id,
+                'location_dest_id': self.env.ref('stock.stock_location_production').id,
                 'state': 'draft',
             })
             moves.append(move)
@@ -102,12 +102,12 @@ class MeatProcessingOrder(models.Model):
         self.ensure_one()
         if not self.product_ids:
             raise UserError('La orden de procesamiento debe tener al menos un producto.')
-        
+
         production = self.env['mrp.production'].create({
             'product_id': self.product_ids[0].id,
             'product_qty': self.total_kilos or 0.0,
             'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
-            'location_src_id': self.env.ref('stock.stock_location_stock').id,
+            'location_src_id': self.env.ref('stock.stock_location_production').id,
             'location_dest_id': self.env.ref('stock.stock_location_stock').id,
             'origin': self.name,
             'state': 'confirmed',
