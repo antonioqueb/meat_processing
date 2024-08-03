@@ -9,6 +9,8 @@ class MeatProcessingOrder(models.Model):
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
     total_kilos = fields.Float(string='Total Kilos', required=True)
+    processed_kilos = fields.Float(string='Kilos Procesados', compute='_compute_processed_kilos', store=True)
+    remaining_kilos = fields.Float(string='Kilos Restantes', compute='_compute_remaining_kilos', store=True)
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('processing', 'En Proceso'),
@@ -29,6 +31,16 @@ class MeatProcessingOrder(models.Model):
     def _compute_total_amount(self):
         for order in self:
             order.total_amount = sum(line.subtotal for line in order.order_line_ids)
+
+    @api.depends('order_line_ids.quantity')
+    def _compute_processed_kilos(self):
+        for order in self:
+            order.processed_kilos = sum(line.quantity for line in order.order_line_ids)
+
+    @api.depends('total_kilos', 'processed_kilos')
+    def _compute_remaining_kilos(self):
+        for order in self:
+            order.remaining_kilos = order.total_kilos - order.processed_kilos
 
     @api.depends('state')
     def _compute_can_confirm(self):
@@ -59,7 +71,6 @@ class MeatProcessingOrder(models.Model):
         if self.state != 'processing':
             raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
         self.write({'state': 'done'})
-
         for product in self.product_ids:
             stock_quants = self.env['stock.quant'].search([('product_id', '=', product.id)])
             if stock_quants:
@@ -74,6 +85,7 @@ class MeatProcessingOrder(models.Model):
                 'quantity': line.quantity,
                 'uom_id': self.env.ref('uom.product_uom_kgm').id,
             })
+
         self._create_production_order()
 
     def _create_production_order(self):
@@ -85,8 +97,6 @@ class MeatProcessingOrder(models.Model):
             'location_src_id': self.env.ref('stock.stock_location_stock').id,
             'location_dest_id': self.env.ref('stock.stock_location_stock').id,
             'origin': self.name,
-            # Eliminar o ajustar el campo date_planned_start si es necesario
-            # 'date_planned_start': fields.Datetime.now(),
         }
         self.env['mrp.production'].create(production_vals)
 
