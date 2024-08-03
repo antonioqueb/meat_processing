@@ -71,34 +71,53 @@ class MeatProcessingOrder(models.Model):
         if self.state != 'processing':
             raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
         self.write({'state': 'done'})
-        stock_quant_location_id = None
-        for product in self.product_ids:
-            stock_quants = self.env['stock.quant'].search([('product_id', '=', product.id)])
-            if stock_quants:
-                stock_quant_location_id = stock_quants[0].location_id.id
-                stock_quants.sudo().unlink()
-            else:
-                stock_quant_location_id = self.env.ref('stock.stock_location_stock').id
 
-        for line in self.order_line_ids:
-            self.env['stock.quant'].create({
-                'product_id': line.product_id.id,
-                'location_id': stock_quant_location_id,
-                'quantity': line.quantity,
-            })
-
+        self._create_stock_moves()
         self._create_production_order()
+
+    def _create_stock_moves(self):
+        location_src_id = self.env.ref('stock.stock_location_stock').id
+        location_dest_id = self.env.ref('stock.stock_location_stock').id
+
+        # Crear movimientos de inventario para los productos procesados
+        for line in self.order_line_ids:
+            move = self.env['stock.move'].create({
+                'name': _('Consumo de %s') % line.product_id.display_name,
+                'product_id': line.product_id.id,
+                'product_uom_qty': line.quantity,
+                'product_uom': line.uom_id.id,
+                'location_id': location_src_id,
+                'location_dest_id': location_dest_id,
+                'state': 'done',
+            })
+            move._action_done()
 
     def _create_production_order(self):
         self.ensure_one()
         if not self.product_ids:
             raise UserError('La orden de procesamiento debe tener al menos un producto.')
-        production_vals = {
+        
+        production = self.env['mrp.production'].create({
             'product_id': self.product_ids[0].id,
             'product_qty': self.total_kilos or 0.0,
             'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
-        }
-        self.env['mrp.production'].create(production_vals)
+            'location_src_id': self.env.ref('stock.stock_location_stock').id,
+            'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+            'origin': self.name,
+            'state': 'confirmed',
+        })
+
+        for line in self.order_line_ids:
+            self.env['mrp.bom.line'].create({
+                'bom_id': production.bom_id.id,
+                'product_id': line.product_id.id,
+                'product_qty': line.quantity,
+                'product_uom_id': line.uom_id.id,
+            })
+
+        production.action_assign()
+        production.button_plan()
+        production.button_mark_done()
 
     def action_cancel(self):
         self.ensure_one()
