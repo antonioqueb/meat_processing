@@ -75,7 +75,7 @@ class MeatProcessingOrder(models.Model):
         self._create_production_orders()
 
     def _create_stock_moves(self):
-        location_src_id = self.env.ref('stock.stock_location_stock').id  # Ubicación de origen correcta
+        location_src_id = self.env.ref('stock.stock_location_stock').id
         location_dest_id = self._get_location_production_id()
 
         for line in self.order_line_ids:
@@ -85,7 +85,7 @@ class MeatProcessingOrder(models.Model):
                     'product_id': product.id,
                     'product_uom_qty': line.used_kilos,
                     'product_uom': product.uom_id.id,
-                    'location_id': location_src_id,  # Asegurar que la ubicación de origen sea WH/Existencias
+                    'location_id': location_src_id,
                     'location_dest_id': location_dest_id,
                     'state': 'draft',
                 })
@@ -128,8 +128,8 @@ class MeatProcessingOrder(models.Model):
                 'product_qty': line.quantity,
                 'product_uom_id': line.uom_id.id,
                 'bom_id': bom.id,
-                'location_src_id': self.env.ref('stock.stock_location_stock').id,  # Asegurar que la ubicación de origen sea WH/Existencias
-                'location_dest_id': self._get_location_production_id(),  # Corregir ubicación destino
+                'location_src_id': self._get_location_production_id(),
+                'location_dest_id': self.env.ref('stock.stock_location_stock').id,
                 'origin': self.name,
             })
 
