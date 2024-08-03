@@ -8,7 +8,7 @@ class MeatProcessingOrder(models.Model):
     name = fields.Char(string='Nombre de la Orden', required=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
-    total_kilos = fields.Float(string='Total Kilos', required=False)  # Permitir nulo en el modelo
+    total_kilos = fields.Float(string='Total Kilos', required=False)
     processed_kilos = fields.Float(string='Kilos Procesados', compute='_compute_processed_kilos', store=True)
     remaining_kilos = fields.Float(string='Kilos Restantes', compute='_compute_remaining_kilos', store=True)
     state = fields.Selection([
@@ -21,7 +21,6 @@ class MeatProcessingOrder(models.Model):
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
 
-    # Campos para la visibilidad de los botones
     can_confirm = fields.Boolean(string='Puede Confirmar', compute='_compute_can_confirm')
     can_done = fields.Boolean(string='Puede Finalizar', compute='_compute_can_done')
     can_cancel = fields.Boolean(string='Puede Cancelar', compute='_compute_can_cancel')
@@ -77,33 +76,27 @@ class MeatProcessingOrder(models.Model):
 
     def _create_stock_moves(self):
         location_src_id = self.env.ref('stock.stock_location_stock').id
-        location_production_id = self._get_location_production_id()
+        location_dest_id = self._get_location_production_id()
 
-        # Crear movimientos de inventario para los productos procesados
-        moves = []
-        for product in self.product_ids:
-            move = self.env['stock.move'].create({
-                'name': _('Consumo de %s') % product.display_name,
-                'product_id': product.id,
-                'product_uom_qty': product.weight,
-                'product_uom': product.uom_id.id,
-                'location_id': location_src_id,
-                'location_dest_id': location_production_id,
-                'state': 'draft',
-            })
-            moves.append(move)
-        
-        for move in moves:
-            move._action_confirm()
-            move._action_assign()
-            move._action_done()
+        for line in self.order_line_ids:
+            for product in self.product_ids:
+                move = self.env['stock.move'].create({
+                    'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
+                    'product_id': product.id,
+                    'product_uom_qty': line.used_kilos,
+                    'product_uom': product.uom_id.id,
+                    'location_id': location_src_id,
+                    'location_dest_id': location_dest_id,
+                    'state': 'confirmed',
+                })
+                move._action_confirm()
+                move._action_assign()
+                move._action_done()
 
     def _get_location_production_id(self):
-        # Intenta obtener la ubicación de producción usando diferentes métodos
         try:
             return self.env.ref('stock.stock_location_production').id
         except ValueError:
-            # Si no se encuentra la ubicación por defecto, usa una búsqueda alternativa
             production_location = self.env['stock.location'].search([('usage', '=', 'production')], limit=1)
             if production_location:
                 return production_location.id
@@ -116,7 +109,6 @@ class MeatProcessingOrder(models.Model):
             raise UserError('La orden de procesamiento debe tener al menos un producto.')
 
         for line in self.order_line_ids:
-            # Crear la BoM y asociar las líneas de BoM
             bom = self.env['mrp.bom'].create({
                 'product_tmpl_id': line.product_id.product_tmpl_id.id,
                 'product_qty': line.quantity,
@@ -124,11 +116,10 @@ class MeatProcessingOrder(models.Model):
                 'type': 'normal',
             })
 
-            # Crear las líneas de BoM con el canal como ingrediente
             self.env['mrp.bom.line'].create({
                 'bom_id': bom.id,
                 'product_id': self.product_ids[0].id,
-                'product_qty': line.used_kilos,  # Usar los kilos especificados por el usuario
+                'product_qty': line.used_kilos,
                 'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
             })
 
