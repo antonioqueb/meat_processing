@@ -71,17 +71,19 @@ class MeatProcessingOrder(models.Model):
         if self.state != 'processing':
             raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
         self.write({'state': 'done'})
+        stock_quant_location_id = None
         for product in self.product_ids:
             stock_quants = self.env['stock.quant'].search([('product_id', '=', product.id)])
             if stock_quants:
+                stock_quant_location_id = stock_quants[0].location_id.id
                 stock_quants.sudo().unlink()
             else:
-                stock_quants = self.env['stock.quant'].browse([])
+                stock_quant_location_id = self.env.ref('stock.stock_location_stock').id
 
         for line in self.order_line_ids:
             self.env['stock.quant'].create({
                 'product_id': line.product_id.id,
-                'location_id': stock_quants and stock_quants[0].location_id.id or self.env.ref('stock.stock_location_stock').id,
+                'location_id': stock_quant_location_id,
                 'quantity': line.quantity,
                 'uom_id': self.env.ref('uom.product_uom_kgm').id,
             })
@@ -90,6 +92,8 @@ class MeatProcessingOrder(models.Model):
 
     def _create_production_order(self):
         self.ensure_one()
+        if not self.product_ids:
+            raise UserError('La orden de procesamiento debe tener al menos un producto.')
         production_vals = {
             'product_id': self.product_ids[0].id,
             'product_qty': self.total_kilos,
