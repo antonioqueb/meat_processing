@@ -4,19 +4,17 @@ odoo.define('meat_processing.kanban_color', function (require) {
     var KanbanRecord = require('web.KanbanRecord');
 
     KanbanRecord.include({
-        kanban_get_color: function (state) {
-            switch (state) {
-                case 'draft':
-                    return 'bg-warning';
-                case 'processing':
-                    return 'bg-info';
-                case 'done':
-                    return 'bg-success';
-                case 'cancelled':
-                    return 'bg-danger';
-                default:
-                    return '';
-            }
+        _render: function () {
+            this._super.apply(this, arguments);
+            var state = this.recordData.state;
+            this.$el.addClass('o_kanban_color_' + state);
+            this.$el.hover(
+                function() {
+                    $(this).css("box-shadow", "0 6px 12px rgba(0, 0, 0, 0.2)");
+                }, function() {
+                    $(this).css("box-shadow", "0 4px 8px rgba(0, 0, 0, 0.1)");
+                }
+            );
         }
     });
 });
