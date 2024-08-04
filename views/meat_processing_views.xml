@@ -78,12 +78,11 @@
                                     </div>
                                     <div class="o_kanban_card_body">
                                         <div>
-                                           
-                                            <strong>Fecha de Orden:</strong>
+                                         
                                             <span class="field-value"><field name="order_date" widget="date" string="Fecha de Orden"/></span>
                                         </div>
                                         <div>
-                                            <strong>Productos:</strong>
+                                           
                                             <span class="field-value"><field name="product_ids" widget="many2many_tags" string="Productos"/></span>
                                         </div>
                                         <div>
@@ -103,7 +102,7 @@
                                             <span class="field-value"><field name="waste_kilos" widget="float" string="Desperdicio (kg)"/></span>
                                         </div>
                                         <div>
-                                            <strong>Monto Total:</strong>
+                                            <strong>$</strong>
                                             <span class="field-value"><field name="total_amount" widget="monetary" string="Monto Total"/></span>
                                         </div>
                                         <div>
