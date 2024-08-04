@@ -3,7 +3,7 @@ from odoo.exceptions import UserError
 
 class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
-    _description = 'Orden de Procesamiento de Carne'
+    _description = 'Orden de Despiece de Carne'
 
     name = fields.Char(string='Nombre de la Orden', required=True, readonly=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
@@ -129,7 +129,7 @@ class MeatProcessingOrder(models.Model):
     def _create_production_orders(self):
         self.ensure_one()
         if not self.product_ids:
-            raise UserError('La orden de procesamiento debe tener al menos un producto.')
+            raise UserError('La Orden de Despiece debe tener al menos un producto.')
 
         for line in self.order_line_ids:
             bom = self.env['mrp.bom'].create({
@@ -171,7 +171,7 @@ class MeatProcessingOrder(models.Model):
 
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
-    _description = 'Línea de Orden de Procesamiento de Carne'
+    _description = 'Línea de Orden de Despiece de Carne'
 
     name = fields.Char(string='Nombre de la Línea de Orden')
     order_id = fields.Many2one('meat.processing.order', string='Orden', required=True, ondelete='cascade', index=True)
