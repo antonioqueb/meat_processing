@@ -81,12 +81,22 @@ class MeatProcessingOrder(models.Model):
         self._create_stock_moves()
         self._create_production_orders()
 
+    def _check_product_availability(self, product, location, quantity):
+        quants = self.env['stock.quant'].search([
+            ('product_id', '=', product.id),
+            ('location_id', '=', location.id)
+        ])
+        available_qty = sum(quant.quantity - quant.reserved_quantity for quant in quants)
+        if available_qty < quantity:
+            raise UserError(_('No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s') % (product.display_name, location.display_name, available_qty, quantity))
+
     def _create_stock_moves(self):
         location_src_id = self.location_id.id
         location_dest_id = self._get_location_production_id()
 
         for line in self.order_line_ids:
             for product in self.product_ids:
+                self._check_product_availability(product, self.location_id, line.used_kilos)
                 move = self.env['stock.move'].create({
                     'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
                     'product_id': product.id,
@@ -135,7 +145,7 @@ class MeatProcessingOrder(models.Model):
                 'product_qty': line.quantity,
                 'product_uom_id': line.uom_id.id,
                 'bom_id': bom.id,
-                'location_src_id': self.location_id.id,  # Usar la ubicación seleccionada
+                'location_src_id': self.location_id.id,
                 'location_dest_id': self.env.ref('stock.stock_location_stock').id,
                 'origin': self.name,
             })
