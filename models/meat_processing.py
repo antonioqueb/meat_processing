@@ -132,6 +132,12 @@ class MeatProcessingOrder(models.Model):
         for line in self.order_line_ids:
             for product in self.product_ids:
                 self._check_product_availability(product, self.location_id, line.used_kilos)
+
+                # Validar que los lotes están presentes
+                if not line.lot_ids:
+                    _logger.warning('No se proporcionaron lotes para el producto %s en la línea de orden %s', product.display_name, line.name)
+                    raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (product.display_name, line.name))
+
                 _logger.info('Creando movimiento de stock para el producto %s con los lotes %s', product.display_name, line.lot_ids.mapped('name'))
                 move = self.env['stock.move'].create({
                     'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
