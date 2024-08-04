@@ -78,7 +78,7 @@
                                     </div>
                                     <div class="o_kanban_card_body">
                                         <div>
-                                            <span class="fa fa-calendar" aria-hidden="true"></span>
+                                           
                                             <strong>Fecha de Orden:</strong>
                                             <span class="field-value"><field name="order_date" widget="date" string="Fecha de Orden"/></span>
                                         </div>
@@ -111,10 +111,7 @@
                                             <span class="field-value"><field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled" string="Estado"/></span>
                                         </div>
                                     </div>
-                                    <div class="o_kanban_card_footer">
-                                        <strong>Notas:</strong>
-                                        <span class="field-value"><field name="notes" widget="text" string="Notas"/></span>
-                                    </div>
+                                  
                                 </div>
                             </div>
                         </t>
