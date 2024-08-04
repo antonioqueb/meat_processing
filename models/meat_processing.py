@@ -127,12 +127,13 @@ class MeatProcessingOrder(models.Model):
                     'product_uom': product.uom_id.id,
                     'location_id': location_src_id,
                     'location_dest_id': location_dest_id,
-                    'lot_ids': [(6, 0, line.lot_ids.ids)], 
+                    'lot_ids': [(6, 0, line.lot_ids.ids)],  # Campo correcto para many2many
                     'state': 'draft',
                 })
                 move._action_confirm()
                 move._action_assign()
                 move._action_done()
+
 
     def _get_location_production_id(self):
         try:
