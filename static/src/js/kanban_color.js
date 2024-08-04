@@ -1,29 +1,22 @@
-/** @odoo-module **/
+odoo.define('meat_processing.kanban_color', function (require) {
+    "use strict";
 
-import { patch } from '@web/core/utils/patch';
-import { KanbanRecord } from '@web/views/kanban/kanban_record';
+    var KanbanRecord = require('web.KanbanRecord');
 
-function getColorClass(state) {
-    switch (state) {
-        case 'draft':
-            return 'o_kanban_color_draft';
-        case 'processing':
-            return 'o_kanban_color_processing';
-        case 'done':
-            return 'o_kanban_color_done';
-        case 'cancelled':
-            return 'o_kanban_color_cancelled';
-        default:
-            return '';
-    }
-}
-
-patch(KanbanRecord.prototype, 'meat_processing.KanbanRecord', {
-    setup() {
-        this._super.apply(this, arguments);
-    },
-    get classes() {
-        const baseClasses = this._super;
-        return `${baseClasses} ${getColorClass(this.props.record.data.state)}`;
-    }
+    KanbanRecord.include({
+        kanban_get_color: function (state) {
+            switch (state) {
+                case 'draft':
+                    return 'bg-warning';
+                case 'processing':
+                    return 'bg-info';
+                case 'done':
+                    return 'bg-success';
+                case 'cancelled':
+                    return 'bg-danger';
+                default:
+                    return '';
+            }
+        }
+    });
 });
