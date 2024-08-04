@@ -28,10 +28,11 @@
             <field name="arch" type="xml">
                 <form string="Orden de Despiece">
                     <header>
-                        <button string="Confirmar" type="object" name="action_confirm" class="btn-primary o_button_state_draft"/>
-                        <button string="Hecho" type="object" name="action_done" class="btn-success o_button_state_processing"/>
-                        <button string="Cancelar" type="object" name="action_cancel" class="btn-danger o_button_state_draft o_button_state_processing"/>
-                        <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary o_button_state_cancelled"/>
+                        <button string="Confirmar" type="object" name="action_confirm" class="btn-primary" states="draft"/>
+                        <button string="Hecho" type="object" name="action_done" class="btn-success" states="processing"/>
+                        <button string="Cancelar" type="object" name="action_cancel" class="btn-danger" states="draft,processing"/>
+                        <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary" states="cancelled"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled" readonly="1"/>
                     </header>
                     <sheet>
                         <group>
@@ -43,7 +44,6 @@
                             <field name="processed_kilos" readonly="1" class="o_form_input"/>
                             <field name="remaining_kilos" readonly="1" class="o_form_input"/>
                             <field name="waste_kilos" readonly="1" class="o_form_input"/>
-                            <field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled" readonly="1" class="o_form_input"/>
                             <field name="total_amount" readonly="1" class="o_form_input"/>
                             <field name="notes" class="o_form_input"/>
                         </group>
