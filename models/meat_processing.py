@@ -23,8 +23,7 @@ class MeatProcessingOrder(models.Model):
     order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden', required=True)
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
-    lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')
-
+    lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')  # Campo ajustado
 
     # Nuevos campos añadidos
     start_time = fields.Datetime(string='Hora de Inicio', required=False, default=fields.Datetime.now)
@@ -128,7 +127,7 @@ class MeatProcessingOrder(models.Model):
                         'product_uom': product.uom_id.id,
                         'location_id': location_src_id,
                         'location_dest_id': location_dest_id,
-                        'restrict_lot_id': lot.id,
+                        'lot_id': lot.id,  # Campo correcto
                         'state': 'draft',
                     })
                     move._action_confirm()
@@ -189,6 +188,7 @@ class MeatProcessingOrder(models.Model):
         self.write({'state': 'draft'})
 
 
+
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
     _description = 'Línea de Orden de Despiece de Carne'
@@ -201,7 +201,7 @@ class MeatProcessingOrderLine(models.Model):
     unit_price = fields.Float(string='Precio Unitario', required=True, default=0.0)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
-    lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')
+    lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')  # Campo ajustado
 
     @api.depends('quantity', 'unit_price')
     def _compute_subtotal(self):
