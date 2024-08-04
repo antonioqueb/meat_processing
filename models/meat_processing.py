@@ -23,6 +23,7 @@ class MeatProcessingOrder(models.Model):
     order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden', required=True)
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
+    lot_ids = fields.Many2many('stock.production.lot', string='Lotes del Producto')  # Campo añadido para lotes
 
     # Nuevos campos añadidos
     start_time = fields.Datetime(string='Hora de Inicio', required=False, default=fields.Datetime.now)
@@ -218,6 +219,12 @@ class MeatProcessingOrderLine(models.Model):
     # Métodos del modelo
     @api.depends('quantity', 'unit_price')
     def _compute_subtotal(self):
-        # Calcular el subtotal de la línea
         for line in self:
             line.subtotal = line.quantity * line.unit_price
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        if self.product_id:
+            return {'domain': {'lot_ids': [('product_id', '=', self.product_id.id)]}}
+        else:
+            return {'domain': {'lot_ids': [('id', '=', False)]}}  # No mostrar lotes si no hay producto seleccionado
