@@ -25,9 +25,9 @@ class MeatProcessingOrder(models.Model):
     notes = fields.Text(string='Notas')
     
     # Nuevos campos añadidos
-    start_time = fields.Datetime(string='Hora de Inicio', required=True, default=fields.Datetime.now)
-    responsible_id = fields.Many2one('res.users', string='Responsable', required=True, ondelete='restrict', index=True)
-    lot_id = fields.Many2one('stock.production.lot', string='Lote del Producto', required=True, ondelete='restrict', index=True)
+    start_time = fields.Datetime(string='Hora de Inicio', required=False, default=fields.Datetime.now)
+    responsible_id = fields.Many2one('res.users', string='Responsable', required=False, ondelete='restrict', index=True)
+    lot_id = fields.Many2one('stock.production.lot', string='Lote del Producto', required=False, ondelete='restrict', index=True)
     progress = fields.Float(string='Progreso', compute='_compute_progress', store=True)
     
     # Campos booleanos para gestionar las acciones disponibles
