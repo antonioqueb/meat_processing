@@ -5,11 +5,12 @@ class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
     _description = 'Orden de Despiece de Carne'
 
+    # Campos principales
     name = fields.Char(string='Nombre de la Orden', required=True, readonly=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
     location_id = fields.Many2one('stock.location', string='Ubicación del Producto', required=True, ondelete='restrict', index=True)
-    total_kilos = fields.Float(string='Total Kilos', required=False)
+    total_kilos = fields.Float(string='Total Kilos')
     processed_kilos = fields.Float(string='Kilos Procesados', compute='_compute_processed_kilos', store=True)
     remaining_kilos = fields.Float(string='Kilos Restantes', compute='_compute_remaining_kilos', store=True)
     waste_kilos = fields.Float(string='Kilos de Desperdicio', compute='_compute_waste_kilos', store=True)
@@ -24,11 +25,13 @@ class MeatProcessingOrder(models.Model):
     notes = fields.Text(string='Notas')
     lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')
 
-    start_time = fields.Datetime(string='Hora de Inicio', required=False, default=fields.Datetime.now)
-    responsible_id = fields.Many2one('res.users', string='Responsable', required=False, ondelete='restrict', index=True)
+    # Otros campos
+    start_time = fields.Datetime(string='Hora de Inicio', default=fields.Datetime.now)
+    responsible_id = fields.Many2one('res.users', string='Responsable', index=True)
     progress = fields.Float(string='Progreso', compute='_compute_progress', store=True)
     purchase_order_id = fields.Many2one('purchase.order', string='Orden de Compra de Origen', readonly=True)
     
+    # Campos booleanos para controles
     can_confirm = fields.Boolean(string='Puede Confirmar', compute='_compute_can_confirm')
     can_done = fields.Boolean(string='Puede Finalizar', compute='_compute_can_done')
     can_cancel = fields.Boolean(string='Puede Cancelar', compute='_compute_can_cancel')
@@ -94,15 +97,9 @@ class MeatProcessingOrder(models.Model):
         self.ensure_one()
         if self.state != 'processing':
             raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
-        self._check_lots_assigned()
-        self.write({'state': 'done'})
         self._create_stock_moves()
         self._create_production_orders()
-
-    def _check_lots_assigned(self):
-        for line in self.order_line_ids:
-            if not line.lot_ids:
-                raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (line.product_id.display_name, line.name))
+        self.write({'state': 'done'})
 
     def _check_product_availability(self, product, location, quantity):
         quants = self.env['stock.quant'].search([
@@ -127,13 +124,12 @@ class MeatProcessingOrder(models.Model):
                     'product_uom': product.uom_id.id,
                     'location_id': location_src_id,
                     'location_dest_id': location_dest_id,
-                    'lot_ids': [(6, 0, line.lot_ids.ids)],  # Campo correcto para many2many
+                    'lot_ids': [(6, 0, line.lot_ids.ids)],  # Campo correcto
                     'state': 'draft',
                 })
                 move._action_confirm()
                 move._action_assign()
                 move._action_done()
-
 
     def _get_location_production_id(self):
         try:
@@ -187,6 +183,7 @@ class MeatProcessingOrder(models.Model):
     def action_set_to_draft(self):
         self.ensure_one()
         self.write({'state': 'draft'})
+
 
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
