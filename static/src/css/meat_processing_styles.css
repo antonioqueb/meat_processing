@@ -184,19 +184,3 @@
     margin-top: 10px;
 }
 
-/* Colores para los diferentes estados */
-.o_kanban_card_draft {
-    border-left: 5px solid orange;
-}
-
-.o_kanban_card_processing {
-    border-left: 5px solid blue;
-}
-
-.o_kanban_card_done {
-    border-left: 5px solid green;
-}
-
-.o_kanban_card_cancelled {
-    border-left: 5px solid red;
-}

@@ -10,9 +10,10 @@
     'depends': ['base', 'stock', 'product', 'mrp'],
     'data': [
         'security/ir.model.access.csv',
-        'data/ir_sequence_data.xml',  # Añadir la secuencia
-        'views/meat_processing_views.xml',  # Añadir las vistas
-        'views/meat_processing_menu.xml',  # Añadir el menú
+        'data/ir_sequence_data.xml',
+        'views/meat_processing_views.xml',
+        'views/meat_processing_menu.xml',
+        'views/meat_processing_assets.xml',  # Añadir el archivo de assets
     ],
     'installable': True,
     'application': True,

@@ -1,10 +1,8 @@
-<!-- views\meat_processing_assets.xml -->
 <odoo>
-    <data>
-        <template id="assets_backend" name="meat_processing assets">
-            <xpath expr="." position="inside">
-                <link rel="stylesheet" type="text/css" href="/meat_processing/static/src/css/meat_processing_styles.css"/>
-            </xpath>
-        </template>
-    </data>
+    <template id="assets_backend" name="meat_processing assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/meat_processing/static/src/js/kanban_color.js"></script>
+            <link rel="stylesheet" type="text/css" href="/meat_processing/static/src/css/kanban_color.css"/>
+        </xpath>
+    </template>
 </odoo>

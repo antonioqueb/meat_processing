@@ -1,0 +1,15 @@
+.o_kanban_color_draft {
+    background-color: lightgrey;
+}
+
+.o_kanban_color_processing {
+    background-color: lightblue;
+}
+
+.o_kanban_color_done {
+    background-color: lightgreen;
+}
+
+.o_kanban_color_cancelled {
+    background-color: lightcoral;
+}
