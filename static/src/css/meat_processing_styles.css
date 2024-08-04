@@ -1,13 +1,97 @@
-/* static\src\css\meat_processing_styles.css */
+
+
+/* static/src/css/meat_processing_styles.css */
+
+/* Botones en diferentes estados */
 .o_button_state_draft {
     display: inline-block;
+    background-color: orange;
+    border-color: orange;
+    color: white;
 }
+
 .o_button_state_processing {
     display: inline-block;
+    background-color: blue;
+    border-color: blue;
+    color: white;
 }
+
 .o_button_state_done {
-    display: none;
+    display: inline-block;
+    background-color: green;
+    border-color: green;
+    color: white;
 }
+
 .o_button_state_cancelled {
-    display: none;
+    display: inline-block;
+    background-color: red;
+    border-color: red;
+    color: white;
+}
+
+/* Personalización de campos de entrada */
+.o_form_input {
+    border: 2px solid #ccc;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.o_form_input:focus {
+    border-color: #66afe9;
+    outline: none;
+}
+
+/* Personalización de etiquetas */
+.o_form_label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+    color: #333;
+}
+
+/* Personalización de campos readonly */
+.o_form_input[readonly] {
+    background-color: #f5f5f5;
+    border-color: #ddd;
+}
+
+/* Personalización de widgets de many2many_tags */
+.o_widget_many2many_tags .badge {
+    background-color: #007bff;
+    color: white;
+    border-radius: 3px;
+    margin-right: 5px;
+    padding: 3px 8px;
+}
+
+/* Personalización de la barra de estado */
+.o_statusbar_status {
+    font-weight: bold;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.o_statusbar_status.draft {
+    background-color: orange;
+    color: white;
+}
+
+.o_statusbar_status.processing {
+    background-color: blue;
+    color: white;
+}
+
+.o_statusbar_status.done {
+    background-color: green;
+    color: white;
+}
+
+.o_statusbar_status.cancelled {
+    background-color: red;
+    color: white;
 }

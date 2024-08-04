@@ -13,7 +13,11 @@
                     <field name="processed_kilos"/>
                     <field name="remaining_kilos"/>
                     <field name="waste_kilos"/> <!-- Añadir campo de desperdicio -->
-                    <field name="state"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled">
+                        <decoration-bf color="orange" string="Borrador"/>
+                        <decoration-done color="green" string="Hecho"/>
+                        <decoration-cancel color="red" string="Cancelado"/>
+                    </field>
                     <field name="total_amount"/>
                     <field name="notes"/>
                 </tree>
@@ -34,17 +38,17 @@
                     </header>
                     <sheet>
                         <group>
-                            <field name="name" readonly="1"/>
-                            <field name="order_date"/>
+                            <field name="name" readonly="1" class="o_form_input"/>
+                            <field name="order_date" class="o_form_input"/>
                             <field name="product_ids" widget="many2many_tags"/>
-                            <field name="location_id"/>
-                            <field name="total_kilos" required="1"/>
-                            <field name="processed_kilos" readonly="1"/>
-                            <field name="remaining_kilos" readonly="1"/>
-                            <field name="waste_kilos" readonly="1"/> <!-- Añadir campo de desperdicio -->
-                            <field name="state" readonly="1"/>
-                            <field name="total_amount" readonly="1"/>
-                            <field name="notes"/>
+                            <field name="location_id" class="o_form_input"/>
+                            <field name="total_kilos" required="1" class="o_form_input"/>
+                            <field name="processed_kilos" readonly="1" class="o_form_input"/>
+                            <field name="remaining_kilos" readonly="1" class="o_form_input"/>
+                            <field name="waste_kilos" readonly="1" class="o_form_input"/> <!-- Añadir campo de desperdicio -->
+                            <field name="state" readonly="1" class="o_form_input"/>
+                            <field name="total_amount" readonly="1" class="o_form_input"/>
+                            <field name="notes" class="o_form_input"/>
                         </group>
                         <group>
                             <field name="order_line_ids">

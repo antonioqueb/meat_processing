@@ -1,3 +1,4 @@
+<!-- views\meat_processing_assets.xml -->
 <odoo>
     <data>
         <template id="assets_backend" name="meat_processing assets">
