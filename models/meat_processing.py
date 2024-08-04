@@ -211,6 +211,7 @@ class MeatProcessingOrderLine(models.Model):
     unit_price = fields.Float(string='Precio Unitario', required=True, default=0.0)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
+    lot_id = fields.Many2one('stock.production.lot', string='Lote del Producto', required=False, ondelete='restrict', index=True)
 
     # Métodos del modelo
     @api.depends('quantity', 'unit_price')
