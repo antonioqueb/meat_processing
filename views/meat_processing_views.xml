@@ -63,7 +63,7 @@
             </field>
         </record>
 
-        <!-- Vista Kanban de Órdenes de Procesamiento -->
+ <!-- Vista Kanban de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_kanban" model="ir.ui.view">
             <field name="name">meat.processing.order.kanban</field>
             <field name="model">meat.processing.order</field>
@@ -71,8 +71,7 @@
                 <kanban class="o_meat_processing_kanban" string="Órdenes de Despiece">
                     <templates>
                         <t t-name="kanban-box">
-                            <div class="o_kanban_card o_kanban_record"
-                                 t-attf-class="oe_kanban_global_click o_kanban_card_#{kanban_get_color(record.state)}">
+                            <div class="o_kanban_card o_kanban_record">
                                 <div class="o_kanban_card_header">
                                     <strong><field name="name"/></strong>
                                 </div>
@@ -95,6 +94,8 @@
                 </kanban>
             </field>
         </record>
+
+
         <!-- Vista Calendario de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_calendar" model="ir.ui.view">
             <field name="name">meat.processing.order.calendar</field>
