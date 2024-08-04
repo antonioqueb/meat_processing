@@ -68,7 +68,8 @@
         <field name="name">meat.processing.order.kanban</field>
         <field name="model">meat.processing.order</field>
         <field name="arch" type="xml">
-            <kanban class="o_meat_processing_kanban" string="Órdenes de Despiece">
+            <kanban class="o_meat_processing_kanban" string="Órdenes de Despiece" group_by="state">
+                <field name="state" invisible="1"/>
                 <templates>
                     <t t-name="kanban-box">
                         <div t-attf-href="/web#id=#{record.id.raw_value}&amp;model=meat.processing.order&amp;view_type=form" class="o_kanban_card o_kanban_record">
@@ -78,11 +79,9 @@
                                 </div>
                                 <div class="o_kanban_card_body">
                                     <div>
-                                     
                                         <span class="field-value"><field name="order_date" widget="date" string="Fecha de Orden" readonly="1"/></span>
                                     </div>
                                     <div>
-                                     
                                         <span class="field-value"><field name="product_ids" widget="many2many_tags" string="Productos" readonly="1"/></span>
                                     </div>
                                     <div>
@@ -106,12 +105,10 @@
                                         <span class="field-value"><field name="total_amount" widget="monetary" string="Monto Total" readonly="1"/></span>
                                     </div>
                                     <div>
-                                      
                                         <span class="field-value"><field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled" string="Estado" readonly="1"/></span>
                                     </div>
                                 </div>
                                 <div class="o_kanban_card_footer">
-                                   
                                     <span class="field-value"><field name="notes" widget="text" string="Notas" readonly="1"/></span>
                                 </div>
                             </div>
@@ -121,6 +118,8 @@
             </kanban>
         </field>
     </record>
+
+
 
 
 
