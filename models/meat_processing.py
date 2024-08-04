@@ -218,5 +218,3 @@ class MeatProcessingOrderLine(models.Model):
         # Calcular el subtotal de la línea
         for line in self:
             line.subtotal = line.quantity * line.unit_price
-
-
