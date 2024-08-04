@@ -1,5 +1,5 @@
 <odoo>
-    <template id="assets_backend" name="meat_processing assets" inherit_id="web.assets_backend">
+    <template id="assets_backend" name="meat_processing assets" >
         <xpath expr="." position="inside">
             <script type="text/javascript" src="/meat_processing/static/src/js/kanban_color.js"></script>
             <link rel="stylesheet" type="text/css" href="/meat_processing/static/src/css/kanban_color.css"/>
