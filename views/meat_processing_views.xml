@@ -68,33 +68,26 @@
             <field name="name">meat.processing.order.kanban</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
-                <kanban string="Órdenes de Despiece">
+                <kanban class="o_meat_processing_kanban" string="Órdenes de Despiece">
                     <templates>
                         <t t-name="kanban-box">
-                            <div class="o_kanban_card">
-                                <strong>
-                                    <field name="name"/>
-                                </strong>
-                                <div>
-                                    <field name="order_date"/>
+                            <div class="o_kanban_card o_kanban_record"
+                                 t-attf-class="oe_kanban_global_click o_kanban_card_#{kanban_get_color(record.state)}">
+                                <div class="o_kanban_card_header">
+                                    <strong><field name="name"/></strong>
                                 </div>
-                                <div>
-                                    <field name="total_amount"/>
+                                <div class="o_kanban_card_body">
+                                    <div><field name="order_date" widget="date" string="Fecha de Orden"/></div>
+                                    <div><field name="product_ids" widget="many2many_tags" string="Productos"/></div>
+                                    <div><field name="total_kilos" widget="float" string="Kilos Totales"/></div>
+                                    <div><field name="processed_kilos" widget="float" string="Kilos Procesados"/></div>
+                                    <div><field name="remaining_kilos" widget="float" string="Kilos Restantes"/></div>
+                                    <div><field name="waste_kilos" widget="float" string="Desperdicio (kg)"/></div>
+                                    <div><field name="total_amount" widget="monetary" string="Monto Total"/></div>
+                                    <div><field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled" string="Estado"/></div>
                                 </div>
-                                <div>
-                                    <field name="total_kilos"/>
-                                </div>
-                                <div>
-                                    <field name="processed_kilos"/>
-                                </div>
-                                <div>
-                                    <field name="remaining_kilos"/>
-                                </div>
-                                <div>
-                                    <field name="waste_kilos"/>
-                                </div>
-                                <div>
-                                    <field name="state"/>
+                                <div class="o_kanban_card_footer">
+                                    <field name="notes" widget="text" string="Notas"/>
                                 </div>
                             </div>
                         </t>
