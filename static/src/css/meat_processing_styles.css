@@ -93,3 +93,59 @@
     background-color: red;
     color: white;
 }
+
+
+
+/* static/src/css/meat_processing_styles.css */
+
+/* Estilo general para la tabla */
+.o_list_view {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+    padding: 10px;
+}
+
+/* Estilo para las filas según el estado */
+.o_list_view .o_data_row.o_draft {
+    background-color: #fff8e1;
+}
+
+.o_list_view .o_data_row.o_processing {
+    background-color: #e3f2fd;
+}
+
+.o_list_view .o_data_row.o_done {
+    background-color: #e8f5e9;
+}
+
+.o_list_view .o_data_row.o_cancelled {
+    background-color: #ffebee;
+}
+
+/* Estilo para los encabezados */
+.o_list_view th {
+    background-color: #eeeeee;
+    color: #333333;
+    padding: 10px;
+    text-align: left;
+    font-weight: bold;
+}
+
+/* Estilo para las celdas */
+.o_list_view td {
+    padding: 10px;
+    border-bottom: 1px solid #dddddd;
+}
+
+/* Estilo para los campos monetarios */
+.o_list_view .o_monetary_field {
+    text-align: right;
+    font-weight: bold;
+}
+
+/* Estilo para los campos flotantes */
+.o_list_view .o_float_field {
+    text-align: right;
+}

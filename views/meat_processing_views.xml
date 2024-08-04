@@ -1,21 +1,21 @@
 <odoo>
     <data>
-        <!-- Vista de Árbol de Órdenes de Procesamiento -->
+       <!-- Vista de Árbol de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_tree" model="ir.ui.view">
             <field name="name">meat.processing.order.tree</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
-                <tree string="Órdenes de Despiece">
-                    <field name="name"/>
-                    <field name="order_date"/>
-                    <field name="product_ids"/>
-                    <field name="total_kilos"/>
-                    <field name="processed_kilos"/>
-                    <field name="remaining_kilos"/>
-                    <field name="waste_kilos"/>
-                    <field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled"/>
-                    <field name="total_amount"/>
-                    <field name="notes"/>
+                <tree string="Órdenes de Despiece" decoration-bf="state == 'draft'" decoration-info="state == 'processing'" decoration-success="state == 'done'" decoration-danger="state == 'cancelled'">
+                    <field name="name" string="Nombre" widget="char"/>
+                    <field name="order_date" string="Fecha de Orden"/>
+                    <field name="product_ids" string="Productos"/>
+                    <field name="total_kilos" string="Kilos Totales" widget="float"/>
+                    <field name="processed_kilos" string="Kilos Procesados" widget="float"/>
+                    <field name="remaining_kilos" string="Kilos Restantes" widget="float"/>
+                    <field name="waste_kilos" string="Desperdicio (kg)" widget="float"/>
+                    <field name="state" string="Estado" widget="statusbar" statusbar_visible="draft,processing,done,cancelled"/>
+                    <field name="total_amount" string="Monto Total" widget="monetary"/>
+                    <field name="notes" string="Notas"/>
                 </tree>
             </field>
         </record>
