@@ -64,38 +64,64 @@
         </record>
 
         <!-- Vista Kanban de Órdenes de Procesamiento -->
-<record id="view_meat_processing_order_kanban" model="ir.ui.view">
-    <field name="name">meat.processing.order.kanban</field>
-    <field name="model">meat.processing.order</field>
-    <field name="arch" type="xml">
-        <kanban class="o_meat_processing_kanban" string="Órdenes de Despiece">
-            <templates>
-                <t t-name="kanban-box">
-                    <div class="o_kanban_card o_kanban_record">
-                        <div class="o_kanban_color_#{record.state}">
-                            <div class="o_kanban_card_header">
-                                <strong><field name="name"/></strong>
+            <record id="view_meat_processing_order_kanban" model="ir.ui.view">
+            <field name="name">meat.processing.order.kanban</field>
+            <field name="model">meat.processing.order</field>
+            <field name="arch" type="xml">
+                <kanban class="o_meat_processing_kanban" string="Órdenes de Despiece">
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="o_kanban_card o_kanban_record">
+                                <div class="o_kanban_color_#{record.state}">
+                                    <div class="o_kanban_card_header">
+                                        <strong><field name="name"/></strong>
+                                    </div>
+                                    <div class="o_kanban_card_body">
+                                        <div>
+                                            <span class="fa fa-calendar" aria-hidden="true"></span>
+                                            <field name="order_date" widget="date" string="Fecha de Orden"/>
+                                        </div>
+                                        <div>
+                                            <span class="fa fa-tags" aria-hidden="true"></span>
+                                            <field name="product_ids" widget="many2many_tags" string="Productos"/>
+                                        </div>
+                                        <div>
+                                            <span class="fa fa-balance-scale" aria-hidden="true"></span>
+                                            <field name="total_kilos" widget="float" string="Kilos Totales"/>
+                                        </div>
+                                        <div>
+                                            <span class="fa fa-check" aria-hidden="true"></span>
+                                            <field name="processed_kilos" widget="float" string="Kilos Procesados"/>
+                                        </div>
+                                        <div>
+                                            <span class="fa fa-exclamation-circle" aria-hidden="true"></span>
+                                            <field name="remaining_kilos" widget="float" string="Kilos Restantes"/>
+                                        </div>
+                                        <div>
+                                            <span class="fa fa-trash" aria-hidden="true"></span>
+                                            <field name="waste_kilos" widget="float" string="Desperdicio (kg)"/>
+                                        </div>
+                                        <div>
+                                            <span class="fa fa-money" aria-hidden="true"></span>
+                                            <field name="total_amount" widget="monetary" string="Monto Total"/>
+                                        </div>
+                                        <div>
+                                            <span class="fa fa-tasks" aria-hidden="true"></span>
+                                            <field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled" string="Estado"/>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_card_footer">
+                                        <span class="fa fa-sticky-note" aria-hidden="true"></span>
+                                        <field name="notes" widget="text" string="Notas"/>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="o_kanban_card_body">
-                                <div><field name="order_date" widget="date" string="Fecha de Orden"/></div>
-                                <div><field name="product_ids" widget="many2many_tags" string="Productos"/></div>
-                                <div><field name="total_kilos" widget="float" string="Kilos Totales"/></div>
-                                <div><field name="processed_kilos" widget="float" string="Kilos Procesados"/></div>
-                                <div><field name="remaining_kilos" widget="float" string="Kilos Restantes"/></div>
-                                <div><field name="waste_kilos" widget="float" string="Desperdicio (kg)"/></div>
-                                <div><field name="total_amount" widget="monetary" string="Monto Total"/></div>
-                                <div><field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled" string="Estado"/></div>
-                            </div>
-                            <div class="o_kanban_card_footer">
-                                <field name="notes" widget="text" string="Notas"/>
-                            </div>
-                        </div>
-                    </div>
-                </t>
-            </templates>
-        </kanban>
-    </field>
-</record>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
 
 
         <!-- Vista Calendario de Órdenes de Procesamiento -->
