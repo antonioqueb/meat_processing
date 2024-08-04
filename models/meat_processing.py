@@ -8,6 +8,7 @@ class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
     _description = 'Orden de Despiece de Carne'
 
+    # Campos principales
     name = fields.Char(string='Nombre de la Orden', required=True, readonly=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
@@ -25,13 +26,15 @@ class MeatProcessingOrder(models.Model):
     order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden', required=True)
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
-    raw_material_lot_ids = fields.Many2many('stock.lot', string='Lotes de Materia Prima', compute='_compute_raw_material_lots', store=True)  # Campo computado para lotes
+    raw_material_lot_ids = fields.Many2many('stock.lot', string='Lotes de Materia Prima')  # Se usa para seleccionar los lotes de los productos
 
+    # Otros campos
     start_time = fields.Datetime(string='Hora de Inicio', default=fields.Datetime.now)
     responsible_id = fields.Many2one('res.users', string='Responsable', index=True)
     progress = fields.Float(string='Progreso', compute='_compute_progress', store=True)
     purchase_order_id = fields.Many2one('purchase.order', string='Orden de Compra de Origen', readonly=True)
     
+    # Campos booleanos para controles
     can_confirm = fields.Boolean(string='Puede Confirmar', compute='_compute_can_confirm')
     can_done = fields.Boolean(string='Puede Finalizar', compute='_compute_can_done')
     can_cancel = fields.Boolean(string='Puede Cancelar', compute='_compute_can_cancel')
@@ -89,12 +92,6 @@ class MeatProcessingOrder(models.Model):
         for order in self:
             order.progress = (order.processed_kilos / order.total_kilos) * 100 if order.total_kilos > 0 else 0
 
-    @api.depends('product_ids')
-    def _compute_raw_material_lots(self):
-        for order in self:
-            lots = self.env['stock.lot'].search([('product_id', 'in', order.product_ids.ids)])
-            order.raw_material_lot_ids = lots
-
     def action_confirm(self):
         self.ensure_one()
         self.write({'state': 'processing'})
@@ -105,6 +102,7 @@ class MeatProcessingOrder(models.Model):
         if self.state != 'processing':
             raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
 
+        # Validar que todos los productos tienen lotes asignados
         for line in self.order_line_ids:
             _logger.info('Validando lotes para el producto %s en la línea de orden %s', line.product_id.display_name, line.name)
             if not line.item_lot_ids:
@@ -135,10 +133,12 @@ class MeatProcessingOrder(models.Model):
             for product in self.product_ids:
                 self._check_product_availability(product, self.location_id, line.used_kilos)
 
+                # Validar que los lotes están presentes
                 if not self.raw_material_lot_ids:
                     _logger.warning('No se proporcionaron lotes para el producto %s en la línea de orden %s', product.display_name, line.name)
                     raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (product.display_name, line.name))
 
+                # Obtener el lote correcto para el producto
                 lot_to_use = self.raw_material_lot_ids.filtered(lambda l: l.product_id == product)
                 if not lot_to_use:
                     raise UserError(_('No se encontraron lotes disponibles para el producto %s.') % product.display_name)
@@ -211,7 +211,6 @@ class MeatProcessingOrder(models.Model):
     def action_set_to_draft(self):
         self.ensure_one()
         self.write({'state': 'draft'})
-
 
 
 class MeatProcessingOrderLine(models.Model):
