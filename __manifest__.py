@@ -12,6 +12,7 @@
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',  # Añadir la secuencia
         'views/meat_processing_views.xml',  # Añadir las vistas
+        'views/meat_processing_menu.xml',  # Añadir el menú
     ],
     'installable': True,
     'application': True,
