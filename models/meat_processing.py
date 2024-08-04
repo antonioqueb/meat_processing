@@ -201,7 +201,6 @@ class MeatProcessingOrder(models.Model):
         self.ensure_one()
         self.write({'state': 'draft'})
 
-
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
     _description = 'Línea de Orden de Despiece de Carne'
