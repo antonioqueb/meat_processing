@@ -39,6 +39,7 @@
 
 .o_kanban_card_body .fa {
     margin-right: 5px;
+    margin-left: 5px;
 }
 
 .o_kanban_card_body div {
@@ -56,4 +57,5 @@
 
 .o_kanban_card_footer .fa {
     margin-right: 5px;
+    margin-left: 5px;
 }
