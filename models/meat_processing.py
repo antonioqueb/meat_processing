@@ -5,7 +5,6 @@ class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
     _description = 'Orden de Despiece de Carne'
 
-    # Campos básicos de la orden
     name = fields.Char(string='Nombre de la Orden', required=True, readonly=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
@@ -23,24 +22,20 @@ class MeatProcessingOrder(models.Model):
     order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden', required=True)
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
-    lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')  # Campo ajustado
+    lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')
 
-    # Nuevos campos añadidos
     start_time = fields.Datetime(string='Hora de Inicio', required=False, default=fields.Datetime.now)
     responsible_id = fields.Many2one('res.users', string='Responsable', required=False, ondelete='restrict', index=True)
     progress = fields.Float(string='Progreso', compute='_compute_progress', store=True)
     purchase_order_id = fields.Many2one('purchase.order', string='Orden de Compra de Origen', readonly=True)
     
-    # Campos booleanos para gestionar las acciones disponibles
     can_confirm = fields.Boolean(string='Puede Confirmar', compute='_compute_can_confirm')
     can_done = fields.Boolean(string='Puede Finalizar', compute='_compute_can_done')
     can_cancel = fields.Boolean(string='Puede Cancelar', compute='_compute_can_cancel')
     can_set_to_draft = fields.Boolean(string='Puede Restablecer a Borrador', compute='_compute_can_set_to_draft')
 
-    # Métodos del modelo
     @api.model
     def create(self, vals):
-        # Asignar secuencia al nombre si es 'Nuevo'
         if vals.get('name', _('Nuevo')) == _('Nuevo'):
             vals['name'] = self.env['ir.sequence'].next_by_code('meat.processing.order') or _('Nuevo')
         return super(MeatProcessingOrder, self).create(vals)
@@ -136,7 +131,6 @@ class MeatProcessingOrder(models.Model):
                 move._action_assign()
                 move._action_done()
 
-
     def _get_location_production_id(self):
         try:
             return self.env.ref('stock.stock_location_production').id
@@ -189,6 +183,7 @@ class MeatProcessingOrder(models.Model):
     def action_set_to_draft(self):
         self.ensure_one()
         self.write({'state': 'draft'})
+
 
 
 
