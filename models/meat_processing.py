@@ -127,7 +127,7 @@ class MeatProcessingOrder(models.Model):
                         'product_uom': product.uom_id.id,
                         'location_id': location_src_id,
                         'location_dest_id': location_dest_id,
-                        'lot_id': lot.id,  # Campo correcto
+                        'lot_ids': [(6, 0, line.lot_ids.ids)],  # Campo correcto
                         'state': 'draft',
                     })
                     move._action_confirm()
