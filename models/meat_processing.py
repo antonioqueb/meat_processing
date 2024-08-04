@@ -1,5 +1,8 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+import logging
+
+_logger = logging.getLogger(__name__)
 
 class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
@@ -95,11 +98,21 @@ class MeatProcessingOrder(models.Model):
 
     def action_done(self):
         self.ensure_one()
+        _logger.info('Iniciando action_done para la orden: %s', self.name)
         if self.state != 'processing':
             raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
+
+        # Validar que todos los productos tienen lotes asignados
+        for line in self.order_line_ids:
+            _logger.info('Validando lotes para el producto %s en la línea de orden %s', line.product_id.display_name, line.name)
+            if not line.lot_ids:
+                _logger.warning('No se ha proporcionado el número de lote o serie para el producto %s en la línea de orden %s.', line.product_id.display_name, line.name)
+                raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (line.product_id.display_name, line.name))
+
         self._create_stock_moves()
         self._create_production_orders()
         self.write({'state': 'done'})
+        _logger.info('Orden %s finalizada con éxito', self.name)
 
     def _check_product_availability(self, product, location, quantity):
         quants = self.env['stock.quant'].search([
@@ -107,7 +120,9 @@ class MeatProcessingOrder(models.Model):
             ('location_id', '=', location.id)
         ])
         available_qty = sum(quant.quantity - quant.reserved_quantity for quant in quants)
+        _logger.info('Cantidad disponible de %s en %s: %s', product.display_name, location.display_name, available_qty)
         if available_qty < quantity:
+            _logger.warning('No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s', product.display_name, location.display_name, available_qty, quantity)
             raise UserError(_('No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s') % (product.display_name, location.display_name, available_qty, quantity))
 
     def _create_stock_moves(self):
@@ -117,6 +132,7 @@ class MeatProcessingOrder(models.Model):
         for line in self.order_line_ids:
             for product in self.product_ids:
                 self._check_product_availability(product, self.location_id, line.used_kilos)
+                _logger.info('Creando movimiento de stock para el producto %s con los lotes %s', product.display_name, line.lot_ids.mapped('name'))
                 move = self.env['stock.move'].create({
                     'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
                     'product_id': product.id,
@@ -130,6 +146,7 @@ class MeatProcessingOrder(models.Model):
                 move._action_confirm()
                 move._action_assign()
                 move._action_done()
+                _logger.info('Movimiento de stock creado y finalizado para el producto %s', product.display_name)
 
     def _get_location_production_id(self):
         try:
