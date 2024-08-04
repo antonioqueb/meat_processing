@@ -41,6 +41,11 @@
     margin-right: 5px;
 }
 
+.o_kanban_card_body div {
+    display: flex;
+    align-items: center;
+}
+
 .o_kanban_card_footer {
     margin-top: 10px;
     font-style: italic;
