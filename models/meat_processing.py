@@ -23,7 +23,13 @@ class MeatProcessingOrder(models.Model):
     order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden', required=True)
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
-
+    
+    # Nuevos campos añadidos
+    start_time = fields.Datetime(string='Hora de Inicio', required=True, default=fields.Datetime.now)
+    responsible_id = fields.Many2one('res.users', string='Responsable', required=True, ondelete='restrict', index=True)
+    lot_id = fields.Many2one('stock.production.lot', string='Lote del Producto', required=True, ondelete='restrict', index=True)
+    progress = fields.Float(string='Progreso', compute='_compute_progress', store=True)
+    
     # Campos booleanos para gestionar las acciones disponibles
     can_confirm = fields.Boolean(string='Puede Confirmar', compute='_compute_can_confirm')
     can_done = fields.Boolean(string='Puede Finalizar', compute='_compute_can_done')
@@ -86,6 +92,12 @@ class MeatProcessingOrder(models.Model):
         # Permitir restablecer a borrador si el estado es 'cancelled'
         for order in self:
             order.can_set_to_draft = order.state == 'cancelled'
+    
+    @api.depends('processed_kilos', 'total_kilos')
+    def _compute_progress(self):
+        # Calcular el progreso en base a los kilos procesados y los kilos totales
+        for order in self:
+            order.progress = (order.processed_kilos / order.total_kilos) * 100 if order.total_kilos > 0 else 0
 
     # Acciones de la orden
     def action_confirm(self):
