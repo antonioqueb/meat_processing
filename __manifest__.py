@@ -9,7 +9,7 @@
     'category': 'Inventory',
     'author': 'Your Name',
     'website': 'https://yourwebsite.com',
-    'license': 'LGPL-3',  # Asegúrate de incluir la clave license
+    'license': 'LGPL-3',
     'depends': ['base', 'stock', 'product', 'mrp', 'web'],
     'data': [
         'security/ir.model.access.csv',
@@ -25,4 +25,5 @@
             'meat_processing/static/src/js/*.js',
         ],
     },
+    'images': ['static/description/icon.png'],  # Añade esta línea
 }
