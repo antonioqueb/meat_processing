@@ -113,16 +113,11 @@
                                                 <field name="total_amount" widget="monetary" string="Monto Total"/>
                                             </div>
                                             <div>
-                                                <span class="fa fa-tasks" aria-hidden="true"></span>
-                                                <span>Estado: </span>
+                                                
                                                 <field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled" string="Estado"/>
                                             </div>
                                         </div>
-                                        <div class="o_kanban_card_footer">
-                                            <span class="fa fa-sticky-note" aria-hidden="true"></span>
-                                            <span>Notas: </span>
-                                            <field name="notes" widget="text" string="Notas"/>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                             </t>
