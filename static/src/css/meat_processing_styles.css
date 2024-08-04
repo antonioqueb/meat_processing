@@ -153,34 +153,3 @@
 
 
 /* static/src/css/meat_processing_styles.css */
-
-/* Estilos generales para las tarjetas Kanban */
-.o_kanban_record {
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 10px;
-    padding: 15px;
-    background-color: #ffffff;
-}
-
-.o_kanban_card_header {
-    font-size: 16px;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-
-.o_kanban_card_body {
-    font-size: 14px;
-    color: #666666;
-}
-
-.o_kanban_card_body div {
-    margin-bottom: 5px;
-}
-
-.o_kanban_card_footer {
-    font-size: 12px;
-    color: #999999;
-    margin-top: 10px;
-}
-
