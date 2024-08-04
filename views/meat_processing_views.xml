@@ -21,7 +21,7 @@
             </field>
         </record>
 
-       <!-- Vista de Formulario de Órdenes de Procesamiento -->
+      <!-- Vista de Formulario de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_form" model="ir.ui.view">
             <field name="name">meat.processing.order.form</field>
             <field name="model">meat.processing.order</field>
@@ -44,7 +44,7 @@
                             <field name="processed_kilos" readonly="1" class="o_form_input"/>
                             <field name="remaining_kilos" readonly="1" class="o_form_input"/>
                             <field name="waste_kilos" readonly="1" class="o_form_input"/>
-                            <field name="state" readonly="1" class="o_form_input"/>
+                            <field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled" readonly="1"/>
                             <field name="total_amount" readonly="1" class="o_form_input"/>
                             <field name="notes" class="o_form_input"/>
                         </group>
