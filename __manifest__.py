@@ -1,12 +1,15 @@
 {
     'name': 'Meat Processing',
     'version': '1.0',
-    'category': 'Inventory',
     'summary': 'Manage Meat Processing Orders',
     'description': """
         Module for managing meat processing orders including order creation, 
         processing, and finalization.
     """,
+    'category': 'Inventory',
+    'author': 'Your Name',
+    'website': 'https://yourwebsite.com',
+    'license': 'LGPL-3',  # Asegúrate de incluir la clave license
     'depends': ['base', 'stock', 'product', 'mrp', 'web'],
     'data': [
         'security/ir.model.access.csv',
@@ -14,6 +17,8 @@
         'views/meat_processing_views.xml',
         'views/meat_processing_menu.xml',
     ],
+    'installable': True,
+    'auto_install': False,
     'assets': {
         'web.assets_backend': [
             'meat_processing/static/src/css/meat_processing_styles.css',
@@ -21,8 +26,4 @@
             'meat_processing/static/src/js/kanban_color.js',
         ],
     },
-    'installable': True,
-    'application': True,
-    'auto_install': False,
-    'license': 'LGPL-3',  # Añadir esta línea
 }
