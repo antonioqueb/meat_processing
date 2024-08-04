@@ -1,4 +1,5 @@
 from odoo import models, _
+from odoo.exceptions import UserError
 
 class MeatProcessingOrder(models.Model):
     _inherit = 'meat.processing.order'

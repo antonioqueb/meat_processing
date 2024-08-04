@@ -1,5 +1,4 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
 from . import compute_methods
 from . import stock_move_methods
 
