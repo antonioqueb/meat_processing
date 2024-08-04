@@ -7,8 +7,8 @@
         processing, and finalization.
     """,
     'category': 'Inventory',
-    'author': 'Your Name',
-    'website': 'https://yourwebsite.com',
+    'author': 'Alphaqueb Consulting S.A.S.',
+    'website': 'https://gestpro.cloud',
     'license': 'LGPL-3',
     'depends': ['base', 'stock', 'product', 'mrp', 'web'],
     'data': [
