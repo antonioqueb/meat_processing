@@ -12,12 +12,8 @@
                     <field name="total_kilos"/>
                     <field name="processed_kilos"/>
                     <field name="remaining_kilos"/>
-                    <field name="waste_kilos"/> <!-- Añadir campo de desperdicio -->
-                    <field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled">
-                        <decoration-bf color="orange" string="Borrador"/>
-                        <decoration-done color="green" string="Hecho"/>
-                        <decoration-cancel color="red" string="Cancelado"/>
-                    </field>
+                    <field name="waste_kilos"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled"/>
                     <field name="total_amount"/>
                     <field name="notes"/>
                 </tree>
@@ -45,7 +41,7 @@
                             <field name="total_kilos" required="1" class="o_form_input"/>
                             <field name="processed_kilos" readonly="1" class="o_form_input"/>
                             <field name="remaining_kilos" readonly="1" class="o_form_input"/>
-                            <field name="waste_kilos" readonly="1" class="o_form_input"/> <!-- Añadir campo de desperdicio -->
+                            <field name="waste_kilos" readonly="1" class="o_form_input"/>
                             <field name="state" readonly="1" class="o_form_input"/>
                             <field name="total_amount" readonly="1" class="o_form_input"/>
                             <field name="notes" class="o_form_input"/>
@@ -95,7 +91,7 @@
                                     <field name="remaining_kilos"/>
                                 </div>
                                 <div>
-                                    <field name="waste_kilos"/> <!-- Añadir campo de desperdicio -->
+                                    <field name="waste_kilos"/>
                                 </div>
                                 <div>
                                     <field name="state"/>
@@ -142,7 +138,7 @@
                     <field name="total_kilos"/>
                     <field name="processed_kilos"/>
                     <field name="remaining_kilos"/>
-                    <field name="waste_kilos"/> <!-- Añadir campo de desperdicio -->
+                    <field name="waste_kilos"/>
                     <field name="total_amount"/>
                 </search>
             </field>

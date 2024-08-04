@@ -8,18 +8,18 @@ class MeatProcessingOrder(models.Model):
     name = fields.Char(string='Nombre de la Orden', required=True, readonly=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
-    location_id = fields.Many2one('stock.location', string='Ubicación del Producto', required=True)
+    location_id = fields.Many2one('stock.location', string='Ubicación del Producto', required=True, ondelete='restrict', index=True)
     total_kilos = fields.Float(string='Total Kilos', required=False)
     processed_kilos = fields.Float(string='Kilos Procesados', compute='_compute_processed_kilos', store=True)
     remaining_kilos = fields.Float(string='Kilos Restantes', compute='_compute_remaining_kilos', store=True)
-    waste_kilos = fields.Float(string='Kilos de Desperdicio', compute='_compute_waste_kilos', store=True)  # Nuevo campo para desperdicio
+    waste_kilos = fields.Float(string='Kilos de Desperdicio', compute='_compute_waste_kilos', store=True)
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('processing', 'En Proceso'),
         ('done', 'Finalizado'),
         ('cancelled', 'Cancelado')
     ], string='Estado', default='draft')
-    order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden')
+    order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden', required=True)
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
 
@@ -84,7 +84,6 @@ class MeatProcessingOrder(models.Model):
         if self.state != 'processing':
             raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
         self.write({'state': 'done'})
-
         self._create_stock_moves()
         self._create_production_orders()
 
@@ -175,11 +174,11 @@ class MeatProcessingOrderLine(models.Model):
     _description = 'Línea de Orden de Procesamiento de Carne'
 
     name = fields.Char(string='Nombre de la Línea de Orden')
-    order_id = fields.Many2one('meat.processing.order', string='Orden', required=True)
-    product_id = fields.Many2one('product.product', string='Producto', required=True)
-    quantity = fields.Float(string='Cantidad', required=True)
-    used_kilos = fields.Float(string='Kilos Utilizados', required=True)
-    unit_price = fields.Float(string='Precio Unitario', required=True)
+    order_id = fields.Many2one('meat.processing.order', string='Orden', required=True, ondelete='cascade', index=True)
+    product_id = fields.Many2one('product.product', string='Producto', required=True, ondelete='restrict', index=True)
+    quantity = fields.Float(string='Cantidad', required=True, default=0.0)
+    used_kilos = fields.Float(string='Kilos Utilizados', required=True, default=0.0)
+    unit_price = fields.Float(string='Precio Unitario', required=True, default=0.0)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
 
