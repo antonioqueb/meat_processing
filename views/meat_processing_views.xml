@@ -14,7 +14,7 @@
                     <field name="processed_kilos" string="Kilos Procesados" widget="float"/>
                     <field name="remaining_kilos" string="Kilos Restantes" widget="float"/>
                     <field name="waste_kilos" string="Desperdicio (kg)" widget="float"/>
-                    <field name="state" widget="many2many_tags" string="Estado"/>
+                    <field name="state" string="Estado" widget="statusbar" statusbar_visible="draft,processing,done,cancelled"/>
                     <field name="total_amount" string="Monto Total" widget="monetary"/>
                     <field name="notes" string="Notas"/>
                 </tree>
