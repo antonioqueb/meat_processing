@@ -27,7 +27,7 @@
 
  
         <!-- Vista de Formulario de Órdenes de Procesamiento -->
-        <record id="view_meat_processing_order_form" model="ir.ui.view">
+            <record id="view_meat_processing_order_form" model="ir.ui.view">
             <field name="name">meat.processing.order.form</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
@@ -72,6 +72,7 @@
                 </form>
             </field>
         </record>
+
 
 
 
