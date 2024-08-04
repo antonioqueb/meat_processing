@@ -25,7 +25,7 @@ class MeatProcessingOrder(models.Model):
     order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden', required=True)
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
-    raw_material_lot_ids = fields.Many2many('stock.lot', string='Lotes de Materia Prima', compute='_compute_raw_material_lots', store=True)  # Campo computado para lotes
+    raw_material_lot_ids = fields.Many2many('stock.lot', string='Lotes de Materia Prima')  # No computado, se selecciona manualmente
 
     start_time = fields.Datetime(string='Hora de Inicio', default=fields.Datetime.now)
     responsible_id = fields.Many2one('res.users', string='Responsable', index=True)
@@ -88,12 +88,6 @@ class MeatProcessingOrder(models.Model):
     def _compute_progress(self):
         for order in self:
             order.progress = (order.processed_kilos / order.total_kilos) * 100 if order.total_kilos > 0 else 0
-
-    @api.depends('product_ids')
-    def _compute_raw_material_lots(self):
-        for order in self:
-            lots = self.env['stock.lot'].search([('product_id', 'in', order.product_ids.ids)])
-            order.raw_material_lot_ids = lots
 
     def action_confirm(self):
         self.ensure_one()
