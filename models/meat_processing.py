@@ -118,21 +118,24 @@ class MeatProcessingOrder(models.Model):
 
         for line in self.order_line_ids:
             for product in self.product_ids:
-                for lot in line.lot_ids:
-                    self._check_product_availability(product, self.location_id, line.used_kilos)
-                    move = self.env['stock.move'].create({
-                        'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
-                        'product_id': product.id,
-                        'product_uom_qty': line.used_kilos,
-                        'product_uom': product.uom_id.id,
-                        'location_id': location_src_id,
-                        'location_dest_id': location_dest_id,
-                        'lot_ids': [(6, 0, line.lot_ids.ids)],  # Campo correcto
-                        'state': 'draft',
-                    })
-                    move._action_confirm()
-                    move._action_assign()
-                    move._action_done()
+                if not line.lot_ids:
+                    raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (product.display_name, line.name))
+                
+                self._check_product_availability(product, self.location_id, line.used_kilos)
+                move = self.env['stock.move'].create({
+                    'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
+                    'product_id': product.id,
+                    'product_uom_qty': line.used_kilos,
+                    'product_uom': product.uom_id.id,
+                    'location_id': location_src_id,
+                    'location_dest_id': location_dest_id,
+                    'lot_ids': [(6, 0, line.lot_ids.ids)],  # Campo correcto
+                    'state': 'draft',
+                })
+                move._action_confirm()
+                move._action_assign()
+                move._action_done()
+
 
     def _get_location_production_id(self):
         try:
