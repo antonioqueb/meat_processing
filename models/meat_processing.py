@@ -8,7 +8,7 @@ class MeatProcessingOrder(models.Model):
     name = fields.Char(string='Nombre de la Orden', required=True, readonly=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
-    location_id = fields.Many2one('stock.location', string='Ubicación del Producto', required=True)  # Nuevo campo de ubicación
+    location_id = fields.Many2one('stock.location', string='Ubicación del Producto', required=True)
     total_kilos = fields.Float(string='Total Kilos', required=False)
     processed_kilos = fields.Float(string='Kilos Procesados', compute='_compute_processed_kilos', store=True)
     remaining_kilos = fields.Float(string='Kilos Restantes', compute='_compute_remaining_kilos', store=True)
@@ -135,7 +135,7 @@ class MeatProcessingOrder(models.Model):
                 'product_qty': line.quantity,
                 'product_uom_id': line.uom_id.id,
                 'bom_id': bom.id,
-                'location_src_id': self._get_location_production_id(),
+                'location_src_id': self.location_id.id,  # Usar la ubicación seleccionada
                 'location_dest_id': self.env.ref('stock.stock_location_stock').id,
                 'origin': self.name,
             })
@@ -161,7 +161,7 @@ class MeatProcessingOrderLine(models.Model):
     order_id = fields.Many2one('meat.processing.order', string='Orden', required=True)
     product_id = fields.Many2one('product.product', string='Producto', required=True)
     quantity = fields.Float(string='Cantidad', required=True)
-    used_kilos = fields.Float(string='Kilos Utilizados', required=True)  # Nuevo campo para especificar los kilos utilizados
+    used_kilos = fields.Float(string='Kilos Utilizados', required=True)
     unit_price = fields.Float(string='Precio Unitario', required=True)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
