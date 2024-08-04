@@ -7,7 +7,7 @@
         Module for managing meat processing orders including order creation, 
         processing, and finalization.
     """,
-    'depends': ['base', 'stock', 'product', 'mrp', 'web'],
+    'depends': ['base', 'stock', 'product', 'mrp'],
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence_data.xml',
