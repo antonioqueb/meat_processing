@@ -26,7 +26,7 @@ class MeatProcessingOrder(models.Model):
     order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden', required=True)
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
-    lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')
+    raw_material_lot_ids = fields.Many2many('stock.lot', string='Lotes de Materia Prima')  # Se usa para seleccionar los lotes de los productos
 
     # Otros campos
     start_time = fields.Datetime(string='Hora de Inicio', default=fields.Datetime.now)
@@ -105,7 +105,7 @@ class MeatProcessingOrder(models.Model):
         # Validar que todos los productos tienen lotes asignados
         for line in self.order_line_ids:
             _logger.info('Validando lotes para el producto %s en la línea de orden %s', line.product_id.display_name, line.name)
-            if not line.lot_ids:
+            if not line.item_lot_ids:
                 _logger.warning('No se ha proporcionado el número de lote o serie para el producto %s en la línea de orden %s.', line.product_id.display_name, line.name)
                 raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (line.product_id.display_name, line.name))
 
@@ -123,7 +123,7 @@ class MeatProcessingOrder(models.Model):
         _logger.info('Cantidad disponible de %s en %s: %s', product.display_name, location.display_name, available_qty)
         if available_qty < quantity:
             _logger.warning('No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s', product.display_name, location.display_name, available_qty, quantity)
-            raise UserError(_('No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s') % (product.display_name, location.display_name, available_qty, quantity))
+            raise UserError(_('No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s') % (product.display_name, location.display_name, available_qty))
 
     def _create_stock_moves(self):
         location_src_id = self.location_id.id
@@ -134,15 +134,14 @@ class MeatProcessingOrder(models.Model):
                 self._check_product_availability(product, self.location_id, line.used_kilos)
 
                 # Validar que los lotes están presentes
-                if not self.lot_ids:
-                    _logger.warning('No se proporcionaron lotes para el producto %s en la orden %s', product.display_name, self.name)
-                    raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la orden %s.') % (product.display_name, self.name))
+                if not self.raw_material_lot_ids:
+                    _logger.warning('No se proporcionaron lotes para el producto %s en la línea de orden %s', product.display_name, line.name)
+                    raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (product.display_name, line.name))
 
-                lot_to_use = self.lot_ids.filtered(lambda l: l.product_id == product)
-
+                # Obtener el lote correcto para el producto
+                lot_to_use = self.raw_material_lot_ids.filtered(lambda l: l.product_id == product)
                 if not lot_to_use:
-                    _logger.warning('No se encontró un lote adecuado para el producto %s en la orden %s', product.display_name, self.name)
-                    raise UserError(_('Debe proporcionar el número de lote o serie adecuado para el producto %s en la orden %s.') % (product.display_name, self.name))
+                    raise UserError(_('No se encontraron lotes disponibles para el producto %s.') % product.display_name)
 
                 _logger.info('Creando movimiento de stock para el producto %s con los lotes %s', product.display_name, lot_to_use.mapped('name'))
                 move = self.env['stock.move'].create({
@@ -152,7 +151,7 @@ class MeatProcessingOrder(models.Model):
                     'product_uom': product.uom_id.id,
                     'location_id': location_src_id,
                     'location_dest_id': location_dest_id,
-                    'lot_ids': [(6, 0, lot_to_use.ids)],  # Usar los lotes de la orden
+                    'lot_ids': [(6, 0, lot_to_use.ids)],  # Usar el lote correcto
                     'state': 'draft',
                 })
                 move._action_confirm()
@@ -226,7 +225,7 @@ class MeatProcessingOrderLine(models.Model):
     unit_price = fields.Float(string='Precio Unitario', required=True, default=0.0)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
-    lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')  # Campo ajustado
+    item_lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')  # Campo ajustado
 
     @api.depends('quantity', 'unit_price')
     def _compute_subtotal(self):
@@ -236,6 +235,6 @@ class MeatProcessingOrderLine(models.Model):
     @api.onchange('product_id')
     def _onchange_product_id(self):
         if self.product_id:
-            return {'domain': {'lot_ids': [('product_id', '=', self.product_id.id)]}}
+            return {'domain': {'item_lot_ids': [('product_id', '=', self.product_id.id)]}}
         else:
-            return {'domain': {'lot_ids': [('id', '=', False)]}}  # No mostrar lotes si no hay producto seleccionado
+            return {'domain': {'item_lot_ids': [('id', '=', False)]}}  # No mostrar lotes si no hay producto seleccionado

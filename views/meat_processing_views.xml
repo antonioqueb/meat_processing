@@ -2,7 +2,7 @@
 <odoo>
     <data>
         <!-- Vista de Árbol de Órdenes de Procesamiento -->
-            <record id="view_meat_processing_order_tree" model="ir.ui.view">
+        <record id="view_meat_processing_order_tree" model="ir.ui.view">
             <field name="name">meat.processing.order.tree</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
@@ -10,7 +10,7 @@
                     <field name="name" string="Nombre" widget="char"/>
                     <field name="order_date" string="Fecha de Orden"/>
                     <field name="product_ids" string="Productos"/>
-                    <field name="lot_ids" string="Lotes" widget="many2many_tags"/>
+                    <field name="raw_material_lot_ids" string="Lotes de Materia Prima" widget="many2many_tags"/>
                     <field name="total_kilos" string="Kilos Totales" widget="float"/>
                     <field name="processed_kilos" string="Kilos Procesados" widget="float"/>
                     <field name="remaining_kilos" string="Kilos Restantes" widget="float"/>
@@ -24,10 +24,8 @@
             </field>
         </record>
 
-
- 
         <!-- Vista de Formulario de Órdenes de Procesamiento -->
-            <record id="view_meat_processing_order_form" model="ir.ui.view">
+        <record id="view_meat_processing_order_form" model="ir.ui.view">
             <field name="name">meat.processing.order.form</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
@@ -53,7 +51,7 @@
                             <field name="responsible_id" class="o_form_input"/>
                             <field name="notes" class="o_form_input"/>
                             <field name="purchase_order_id" readonly="1" class="o_form_input"/>
-                            <field name="lot_ids" widget="many2many_tags" class="o_form_input"/>
+                            <field name="raw_material_lot_ids" widget="many2many_tags" class="o_form_input"/>
                         </group>
                         <group>
                             <field name="order_line_ids">
@@ -64,7 +62,7 @@
                                     <field name="unit_price"/>
                                     <field name="uom_id"/>
                                     <field name="subtotal"/>
-                                    <field name="lot_ids" widget="many2many_tags"/>
+                                    <field name="item_lot_ids" widget="many2many_tags"/>
                                 </tree>
                             </field>
                         </group>
@@ -72,10 +70,6 @@
                 </form>
             </field>
         </record>
-
-
-
-
 
         <!-- Vista Kanban de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_kanban" model="ir.ui.view">
