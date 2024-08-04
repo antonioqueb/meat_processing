@@ -134,11 +134,17 @@ class MeatProcessingOrder(models.Model):
                 self._check_product_availability(product, self.location_id, line.used_kilos)
 
                 # Validar que los lotes están presentes
-                if not line.lot_ids:
-                    _logger.warning('No se proporcionaron lotes para el producto %s en la línea de orden %s', product.display_name, line.name)
-                    raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (product.display_name, line.name))
+                if not self.lot_ids:
+                    _logger.warning('No se proporcionaron lotes para el producto %s en la orden %s', product.display_name, self.name)
+                    raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la orden %s.') % (product.display_name, self.name))
 
-                _logger.info('Creando movimiento de stock para el producto %s con los lotes %s', product.display_name, line.lot_ids.mapped('name'))
+                lot_to_use = self.lot_ids.filtered(lambda l: l.product_id == product)
+
+                if not lot_to_use:
+                    _logger.warning('No se encontró un lote adecuado para el producto %s en la orden %s', product.display_name, self.name)
+                    raise UserError(_('Debe proporcionar el número de lote o serie adecuado para el producto %s en la orden %s.') % (product.display_name, self.name))
+
+                _logger.info('Creando movimiento de stock para el producto %s con los lotes %s', product.display_name, lot_to_use.mapped('name'))
                 move = self.env['stock.move'].create({
                     'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
                     'product_id': product.id,
@@ -146,7 +152,7 @@ class MeatProcessingOrder(models.Model):
                     'product_uom': product.uom_id.id,
                     'location_id': location_src_id,
                     'location_dest_id': location_dest_id,
-                    'lot_ids': [(6, 0, line.lot_ids.ids)],  # Campo correcto
+                    'lot_ids': [(6, 0, lot_to_use.ids)],  # Usar los lotes de la orden
                     'state': 'draft',
                 })
                 move._action_confirm()
