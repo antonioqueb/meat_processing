@@ -21,9 +21,7 @@
     'auto_install': False,
     'assets': {
         'web.assets_backend': [
-            'meat_processing/static/src/css/meat_processing_styles.css',
-            'meat_processing/static/src/css/kanban_color.css',
-            'meat_processing/static/src/js/kanban_color.js',
+            'meat_processing/static/src/js/kanban_color.js'
         ],
     },
 }
