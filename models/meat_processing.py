@@ -12,6 +12,7 @@ class MeatProcessingOrder(models.Model):
     total_kilos = fields.Float(string='Total Kilos', required=False)
     processed_kilos = fields.Float(string='Kilos Procesados', compute='_compute_processed_kilos', store=True)
     remaining_kilos = fields.Float(string='Kilos Restantes', compute='_compute_remaining_kilos', store=True)
+    waste_kilos = fields.Float(string='Kilos de Desperdicio', compute='_compute_waste_kilos', store=True)  # Nuevo campo para desperdicio
     state = fields.Selection([
         ('draft', 'Borrador'),
         ('processing', 'En Proceso'),
@@ -47,6 +48,12 @@ class MeatProcessingOrder(models.Model):
     def _compute_remaining_kilos(self):
         for order in self:
             order.remaining_kilos = (order.total_kilos or 0.0) - order.processed_kilos
+
+    @api.depends('processed_kilos', 'order_line_ids.used_kilos')
+    def _compute_waste_kilos(self):
+        for order in self:
+            total_used_kilos = sum(line.used_kilos for line in order.order_line_ids)
+            order.waste_kilos = total_used_kilos - order.processed_kilos
 
     @api.depends('state')
     def _compute_can_confirm(self):
