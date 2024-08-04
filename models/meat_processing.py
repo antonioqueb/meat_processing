@@ -187,6 +187,7 @@ class MeatProcessingOrder(models.Model):
 
 
 
+
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
     _description = 'Línea de Orden de Despiece de Carne'
