@@ -74,6 +74,7 @@
 
 
 
+
         <!-- Vista Kanban de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_kanban" model="ir.ui.view">
         <field name="name">meat.processing.order.kanban</field>
