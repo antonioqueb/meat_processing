@@ -25,5 +25,5 @@
             'meat_processing/static/src/js/*.js',
         ],
     },
-    'images': ['static/description/icon.png'],  # Añade esta línea
+    'images': ['static/description/icon.png'], 
 }
