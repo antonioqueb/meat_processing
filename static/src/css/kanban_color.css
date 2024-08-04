@@ -39,12 +39,15 @@
 
 .o_kanban_card_body .fa {
     margin-right: 5px;
-    margin-left: 5px;
 }
 
 .o_kanban_card_body div {
     display: flex;
     align-items: center;
+}
+
+.o_kanban_card_body .field-value {
+    margin-left: 10px;  /* Padding horizontal entre el título y el valor */
 }
 
 .o_kanban_card_footer {
@@ -57,5 +60,8 @@
 
 .o_kanban_card_footer .fa {
     margin-right: 5px;
-    margin-left: 5px;
+}
+
+.o_kanban_card_footer .field-value {
+    margin-left: 10px;  /* Padding horizontal entre el título y el valor */
 }
