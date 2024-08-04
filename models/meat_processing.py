@@ -99,6 +99,7 @@ class MeatProcessingOrder(models.Model):
         if self.state != 'processing':
             raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
 
+        # Validar que todos los productos tienen lotes asignados
         for line in self.order_line_ids:
             _logger.info('Validando lotes para el producto %s en la línea de orden %s', line.product_id.display_name, line.name)
             if not line.item_lot_ids:
@@ -111,6 +112,7 @@ class MeatProcessingOrder(models.Model):
         _logger.info('Orden %s finalizada con éxito', self.name)
 
     def _check_product_availability(self, product, location, quantity):
+        _logger.info('Comprobando disponibilidad del producto %s en la ubicación %s', product.display_name, location.display_name)
         quants = self.env['stock.quant'].search([
             ('product_id', '=', product.id),
             ('location_id', '=', location.id)
@@ -124,9 +126,11 @@ class MeatProcessingOrder(models.Model):
     def _create_stock_moves(self):
         location_src_id = self.location_id.id
         location_dest_id = self._get_location_production_id()
+        _logger.info('Creando movimientos de stock de %s a %s', self.location_id.display_name, self.env['stock.location'].browse(location_dest_id).display_name)
 
         for line in self.order_line_ids:
             for product in self.product_ids:
+                _logger.info('Procesando producto %s para la línea %s', product.display_name, line.name)
                 self._check_product_availability(product, self.location_id, line.used_kilos)
 
                 if not self.raw_material_lot_ids:
@@ -134,6 +138,7 @@ class MeatProcessingOrder(models.Model):
                     raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (product.display_name, line.name))
 
                 lot_to_use = self.raw_material_lot_ids.filtered(lambda l: l.product_id == product)
+                _logger.info('Lotes disponibles para el producto %s: %s', product.display_name, lot_to_use.mapped('name'))
                 if not lot_to_use:
                     raise UserError(_('No se encontraron lotes disponibles para el producto %s.') % product.display_name)
 
@@ -148,15 +153,19 @@ class MeatProcessingOrder(models.Model):
                     'lot_ids': [(6, 0, lot_to_use.ids)],  # Usar el lote correcto
                     'state': 'draft',
                 })
+                _logger.info('Movimiento de stock %s creado en estado borrador', move.name)
                 move._action_confirm()
+                _logger.info('Movimiento de stock %s confirmado', move.name)
                 move._action_assign()
+                _logger.info('Movimiento de stock %s asignado', move.name)
                 move._action_done()
-                _logger.info('Movimiento de stock creado y finalizado para el producto %s', product.display_name)
+                _logger.info('Movimiento de stock %s finalizado', move.name)
 
     def _get_location_production_id(self):
         try:
             return self.env.ref('stock.stock_location_production').id
         except ValueError:
+            _logger.warning('Referencia de ubicación de producción no encontrada, buscando manualmente')
             production_location = self.env['stock.location'].search([('usage', '=', 'production')], limit=1)
             if production_location:
                 return production_location.id
@@ -169,6 +178,7 @@ class MeatProcessingOrder(models.Model):
             raise UserError('La Orden de Despiece debe tener al menos un producto.')
 
         for line in self.order_line_ids:
+            _logger.info('Creando BOM para el producto %s en la línea %s', line.product_id.display_name, line.name)
             bom = self.env['mrp.bom'].create({
                 'product_tmpl_id': line.product_id.product_tmpl_id.id,
                 'product_qty': line.quantity,
@@ -176,6 +186,7 @@ class MeatProcessingOrder(models.Model):
                 'type': 'normal',
             })
 
+            _logger.info('Agregando línea BOM para el producto %s con cantidad %s', self.product_ids[0].display_name, line.used_kilos)
             self.env['mrp.bom.line'].create({
                 'bom_id': bom.id,
                 'product_id': self.product_ids[0].id,
@@ -183,6 +194,7 @@ class MeatProcessingOrder(models.Model):
                 'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
             })
 
+            _logger.info('Creando orden de producción para el producto %s', line.product_id.display_name)
             production = self.env['mrp.production'].create({
                 'product_id': line.product_id.id,
                 'product_qty': line.quantity,
@@ -193,9 +205,13 @@ class MeatProcessingOrder(models.Model):
                 'origin': self.name,
             })
 
+            _logger.info('Confirmando orden de producción %s', production.name)
             production.action_confirm()
+            _logger.info('Asignando orden de producción %s', production.name)
             production.action_assign()
+            _logger.info('Planificando orden de producción %s', production.name)
             production.button_plan()
+            _logger.info('Marcando como hecha la orden de producción %s', production.name)
             production.button_mark_done()
 
     def action_cancel(self):
@@ -219,7 +235,7 @@ class MeatProcessingOrderLine(models.Model):
     unit_price = fields.Float(string='Precio Unitario', required=True, default=0.0)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
-    item_lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')  # Campo ajustado
+    item_lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')
 
     @api.depends('quantity', 'unit_price')
     def _compute_subtotal(self):
