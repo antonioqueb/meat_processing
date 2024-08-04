@@ -21,17 +21,17 @@
             </field>
         </record>
 
-      <!-- Vista de Formulario de Órdenes de Procesamiento -->
+       <!-- Vista de Formulario de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_form" model="ir.ui.view">
             <field name="name">meat.processing.order.form</field>
             <field name="model">meat.processing.order</field>
             <field name="arch" type="xml">
                 <form string="Orden de Despiece">
                     <header>
-                        <button string="Confirmar" type="object" name="action_confirm" class="btn-primary" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                        <button string="Hecho" type="object" name="action_done" class="btn-success" attrs="{'invisible': [('state', '!=', 'processing')]}"/>
-                        <button string="Cancelar" type="object" name="action_cancel" class="btn-danger" attrs="{'invisible': [('state', 'not in', ('draft', 'processing'))]}"/>
-                        <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary" attrs="{'invisible': [('state', '!=', 'cancelled')]}"/>
+                        <button string="Confirmar" type="object" name="action_confirm" class="btn-primary o_button_state_draft"/>
+                        <button string="Hecho" type="object" name="action_done" class="btn-success o_button_state_processing"/>
+                        <button string="Cancelar" type="object" name="action_cancel" class="btn-danger o_button_state_draft o_button_state_processing"/>
+                        <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary o_button_state_cancelled"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,processing,done,cancelled" readonly="1"/>
                     </header>
                     <sheet>
@@ -44,6 +44,7 @@
                             <field name="processed_kilos" readonly="1" class="o_form_input"/>
                             <field name="remaining_kilos" readonly="1" class="o_form_input"/>
                             <field name="waste_kilos" readonly="1" class="o_form_input"/>
+                            <field name="state" readonly="1" class="o_form_input"/>
                             <field name="total_amount" readonly="1" class="o_form_input"/>
                             <field name="notes" class="o_form_input"/>
                         </group>
