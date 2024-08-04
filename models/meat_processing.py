@@ -27,7 +27,6 @@ class MeatProcessingOrder(models.Model):
     # Nuevos campos añadidos
     start_time = fields.Datetime(string='Hora de Inicio', required=False, default=fields.Datetime.now)
     responsible_id = fields.Many2one('res.users', string='Responsable', required=False, ondelete='restrict', index=True)
-    lot_id = fields.Many2one('stock.production.lot', string='Lote del Producto', required=False, ondelete='restrict', index=True)
     progress = fields.Float(string='Progreso', compute='_compute_progress', store=True)
     purchase_order_id = fields.Many2one('purchase.order', string='Orden de Compra de Origen', readonly=True)
     
