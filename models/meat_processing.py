@@ -198,23 +198,9 @@ class MeatProcessingOrder(models.Model):
         self.ensure_one()
         self.write({'state': 'draft'})
 
-class MeatProcessingOrderLine(models.Model):
-    _name = 'meat.processing.order.line'
-    _description = 'Línea de Orden de Despiece de Carne'
-
-    # Campos de las líneas de orden
-    name = fields.Char(string='Nombre de la Línea de Orden')
-    order_id = fields.Many2one('meat.processing.order', string='Orden', required=True, ondelete='cascade', index=True)
-    product_id = fields.Many2one('product.product', string='Producto', required=True, ondelete='restrict', index=True)
-    quantity = fields.Float(string='Cantidad', required=True, default=0.0)
-    used_kilos = fields.Float(string='Kilos Utilizados', required=True, default=0.0)
-    unit_price = fields.Float(string='Precio Unitario', required=True, default=0.0)
-    subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
-    uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
-
-    # Métodos del modelo
-    @api.depends('quantity', 'unit_price')
-    def _compute_subtotal(self):
-        # Calcular el subtotal de la línea
-        for line in self:
-            line.subtotal = line.quantity * line.unit_price
+    def check_references(self):
+        for order in self:
+            if order.responsible_id and not order.responsible_id.exists():
+                raise UserError(f"Order {order.id} has an invalid responsible_id reference")
+            if order.lot_id and not order.lot_id.exists():
+                raise UserError(f"Order {order.id} has an invalid lot_id reference")
