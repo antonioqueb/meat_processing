@@ -130,19 +130,21 @@ class MeatProcessingOrder(models.Model):
 
         for line in self.order_line_ids:
             for product in self.product_ids:
-                self._check_product_availability(product, self.location_id, line.used_kilos)
-                move = self.env['stock.move'].create({
-                    'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
-                    'product_id': product.id,
-                    'product_uom_qty': line.used_kilos,
-                    'product_uom': product.uom_id.id,
-                    'location_id': location_src_id,
-                    'location_dest_id': location_dest_id,
-                    'state': 'draft',
-                })
-                move._action_confirm()
-                move._action_assign()
-                move._action_done()
+                for lot in line.lot_ids:
+                    self._check_product_availability(product, self.location_id, line.used_kilos)
+                    move = self.env['stock.move'].create({
+                        'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
+                        'product_id': product.id,
+                        'product_uom_qty': line.used_kilos,
+                        'product_uom': product.uom_id.id,
+                        'location_id': location_src_id,
+                        'location_dest_id': location_dest_id,
+                        'restrict_lot_id': lot.id,
+                        'state': 'draft',
+                    })
+                    move._action_confirm()
+                    move._action_assign()
+                    move._action_done()
 
     def _get_location_production_id(self):
         # Obtener la ubicación de producción, levantar un error si no existe
@@ -213,7 +215,7 @@ class MeatProcessingOrderLine(models.Model):
     unit_price = fields.Float(string='Precio Unitario', required=True, default=0.0)
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
-    lot_id = fields.Many2one('stock.production.lot', string='Lote del Producto', required=False, ondelete='restrict', index=True)
+    lot_ids = fields.Many2many('stock.production.lot', string='Lotes del Producto')
 
     # Métodos del modelo
     @api.depends('quantity', 'unit_price')

@@ -23,53 +23,53 @@
         </field>
     </record>
 
-
-
         <!-- Vista de Formulario de Órdenes de Procesamiento -->
-        <record id="view_meat_processing_order_form" model="ir.ui.view">
-        <field name="name">meat.processing.order.form</field>
-        <field name="model">meat.processing.order</field>
-        <field name="arch" type="xml">
-            <form string="Orden de Despiece">
-                <header>
-                    <button string="Confirmar" type="object" name="action_confirm" class="btn-primary o_button_state_draft"/>
-                    <button string="Hecho" type="object" name="action_done" class="btn-success o_button_state_processing"/>
-                    <button string="Cancelar" type="object" name="action_cancel" class="btn-danger o_button_state_draft o_button_state_processing"/>
-                    <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary o_button_state_cancelled"/>
-                </header>
-                <sheet>
-                    <group>
-                        <field name="name" readonly="1" class="o_form_input"/>
-                        <field name="order_date" class="o_form_input"/>
-                        <field name="product_ids" widget="many2many_tags"/>
-                        <field name="location_id" class="o_form_input"/>
-                        <field name="total_kilos" required="1" class="o_form_input"/>
-                        <field name="processed_kilos" readonly="1" class="o_form_input"/>
-                        <field name="remaining_kilos" readonly="1" class="o_form_input"/>
-                        <field name="waste_kilos" readonly="1" class="o_form_input"/>
-                        <field name="state" readonly="1" class="o_form_input"/>
-                        <field name="total_amount" readonly="1" class="o_form_input"/>
-                        <field name="responsible_id" class="o_form_input"/>
-                        <field name="notes" class="o_form_input"/>
-                        <field name="purchase_order_id" readonly="1" class="o_form_input"/>
-                    </group>
-                    <group>
-                        <field name="order_line_ids">
-                            <tree string="Líneas de la Orden">
-                                <field name="product_id"/>
-                                <field name="quantity"/>
-                                <field name="used_kilos"/>
-                                <field name="unit_price"/>
-                                <field name="uom_id"/>
-                                <field name="subtotal"/>
-                                <field name="lot_id"/>
-                            </tree>
-                        </field>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
+            <record id="view_meat_processing_order_form" model="ir.ui.view">
+            <field name="name">meat.processing.order.form</field>
+            <field name="model">meat.processing.order</field>
+            <field name="arch" type="xml">
+                <form string="Orden de Despiece">
+                    <header>
+                        <button string="Confirmar" type="object" name="action_confirm" class="btn-primary o_button_state_draft"/>
+                        <button string="Hecho" type="object" name="action_done" class="btn-success o_button_state_processing"/>
+                        <button string="Cancelar" type="object" name="action_cancel" class="btn-danger o_button_state_draft o_button_state_processing"/>
+                        <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary o_button_state_cancelled"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="name" readonly="1" class="o_form_input"/>
+                            <field name="order_date" class="o_form_input"/>
+                            <field name="product_ids" widget="many2many_tags"/>
+                            <field name="location_id" class="o_form_input"/>
+                            <field name="total_kilos" required="1" class="o_form_input"/>
+                            <field name="processed_kilos" readonly="1" class="o_form_input"/>
+                            <field name="remaining_kilos" readonly="1" class="o_form_input"/>
+                            <field name="waste_kilos" readonly="1" class="o_form_input"/>
+                            <field name="state" readonly="1" class="o_form_input"/>
+                            <field name="total_amount" readonly="1" class="o_form_input"/>
+                            <field name="responsible_id" class="o_form_input"/>
+                            <field name="notes" class="o_form_input"/>
+                            <field name="purchase_order_id" readonly="1" class="o_form_input"/>
+                        </group>
+                        <group>
+                            <field name="order_line_ids">
+                                <tree string="Líneas de la Orden">
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="used_kilos"/>
+                                    <field name="unit_price"/>
+                                    <field name="uom_id"/>
+                                    <field name="subtotal"/>
+                                    <field name="lot_ids" widget="many2many_tags"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
 
 
         <!-- Vista Kanban de Órdenes de Procesamiento -->
