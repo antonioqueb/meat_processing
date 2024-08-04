@@ -36,6 +36,7 @@
                             <field name="name" readonly="1"/>
                             <field name="order_date"/>
                             <field name="product_ids" widget="many2many_tags"/>
+                            <field name="location_id"/> <!-- Nuevo campo para ubicación -->
                             <field name="total_kilos" required="1"/>
                             <field name="processed_kilos" readonly="1"/>
                             <field name="remaining_kilos" readonly="1"/>

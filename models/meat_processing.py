@@ -5,9 +5,10 @@ class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
     _description = 'Orden de Procesamiento de Carne'
 
-    name = fields.Char(string='Nombre de la Orden', required=True, default=lambda self: _('Nuevo'))
+    name = fields.Char(string='Nombre de la Orden', required=True, readonly=True, default=lambda self: _('Nuevo'))
     order_date = fields.Date(string='Fecha de Orden', required=True, default=fields.Date.today)
     product_ids = fields.Many2many('product.product', string='Canales', required=True)
+    location_id = fields.Many2one('stock.location', string='Ubicación del Producto', required=True)  # Nuevo campo de ubicación
     total_kilos = fields.Float(string='Total Kilos', required=False)
     processed_kilos = fields.Float(string='Kilos Procesados', compute='_compute_processed_kilos', store=True)
     remaining_kilos = fields.Float(string='Kilos Restantes', compute='_compute_remaining_kilos', store=True)
@@ -25,6 +26,12 @@ class MeatProcessingOrder(models.Model):
     can_done = fields.Boolean(string='Puede Finalizar', compute='_compute_can_done')
     can_cancel = fields.Boolean(string='Puede Cancelar', compute='_compute_can_cancel')
     can_set_to_draft = fields.Boolean(string='Puede Restablecer a Borrador', compute='_compute_can_set_to_draft')
+
+    @api.model
+    def create(self, vals):
+        if vals.get('name', _('Nuevo')) == _('Nuevo'):
+            vals['name'] = self.env['ir.sequence'].next_by_code('meat.processing.order') or _('Nuevo')
+        return super(MeatProcessingOrder, self).create(vals)
 
     @api.depends('order_line_ids.subtotal')
     def _compute_total_amount(self):
@@ -75,7 +82,7 @@ class MeatProcessingOrder(models.Model):
         self._create_production_orders()
 
     def _create_stock_moves(self):
-        location_src_id = self.env.ref('stock.stock_location_stock').id
+        location_src_id = self.location_id.id
         location_dest_id = self._get_location_production_id()
 
         for line in self.order_line_ids:
