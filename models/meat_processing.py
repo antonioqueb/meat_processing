@@ -23,12 +23,13 @@ class MeatProcessingOrder(models.Model):
     order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden', required=True)
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
-    
+
     # Nuevos campos añadidos
     start_time = fields.Datetime(string='Hora de Inicio', required=False, default=fields.Datetime.now)
     responsible_id = fields.Many2one('res.users', string='Responsable', required=False, ondelete='restrict', index=True)
     lot_id = fields.Many2one('stock.production.lot', string='Lote del Producto', required=False, ondelete='restrict', index=True)
     progress = fields.Float(string='Progreso', compute='_compute_progress', store=True)
+    purchase_order_id = fields.Many2one('purchase.order', string='Orden de Compra de Origen', readonly=True)
     
     # Campos booleanos para gestionar las acciones disponibles
     can_confirm = fields.Boolean(string='Puede Confirmar', compute='_compute_can_confirm')
@@ -197,6 +198,7 @@ class MeatProcessingOrder(models.Model):
     def action_set_to_draft(self):
         self.ensure_one()
         self.write({'state': 'draft'})
+
 
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
