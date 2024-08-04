@@ -22,7 +22,6 @@
         </field>
     </record>
 
-
         <!-- Vista de Formulario de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_form" model="ir.ui.view">
     <field name="name">meat.processing.order.form</field>
@@ -66,7 +65,6 @@
         </form>
     </field>
 </record>
-
 
         <!-- Vista Kanban de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_kanban" model="ir.ui.view">
@@ -123,16 +121,6 @@
             </kanban>
         </field>
     </record>
-
-
-
-
-
-
-
-
-
-
 
         <!-- Vista Calendario de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_calendar" model="ir.ui.view">
