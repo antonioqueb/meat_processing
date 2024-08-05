@@ -168,7 +168,7 @@ class MeatProcessingOrder(models.Model):
                             'move_id': move.id,
                             'product_id': product.id,
                             'lot_id': lot.id,
-                            'qty_done': line.used_kilos,
+                            'quantity': line.used_kilos,  # Ajustado el campo correcto
                             'location_id': location_src_id,
                             'location_dest_id': location_dest_id,
                             'product_uom_id': product.uom_id.id,
