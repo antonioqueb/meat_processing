@@ -152,9 +152,9 @@ class MeatProcessingOrder(models.Model):
                     'location_dest_id': location_dest_id,
                     'state': 'draft',
                 })
-                _logger.info('Movimiento de stock %s creado en estado borrador', move.name)
+                _logger.info('Movimiento de stock %s creado en estado borrador', move.display_name)
                 move._action_confirm()
-                _logger.info('Movimiento de stock %s confirmado', move.name)
+                _logger.info('Movimiento de stock %s confirmado', move.display_name)
 
                 # Crear líneas de movimiento con quants asignados
                 for lot in lot_to_use:
@@ -174,12 +174,12 @@ class MeatProcessingOrder(models.Model):
                             'product_uom_id': product.uom_id.id,
                             'quant_id': quant.id
                         })
-                        _logger.info('Línea de movimiento creada: %s', move_line.name)
+                        _logger.info('Línea de movimiento creada: %s', move_line.display_name)
 
                 move._action_assign()
-                _logger.info('Movimiento de stock %s asignado', move.name)
+                _logger.info('Movimiento de stock %s asignado', move.display_name)
                 move._action_done()
-                _logger.info('Movimiento de stock %s finalizado', move.name)
+                _logger.info('Movimiento de stock %s finalizado', move.display_name)
 
     def _get_location_production_id(self):
         try:
