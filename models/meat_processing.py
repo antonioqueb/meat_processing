@@ -150,12 +150,32 @@ class MeatProcessingOrder(models.Model):
                     'product_uom': product.uom_id.id,
                     'location_id': location_src_id,
                     'location_dest_id': location_dest_id,
-                    'lot_ids': [(6, 0, lot_to_use.ids)],  # Usar el lote correcto
                     'state': 'draft',
                 })
                 _logger.info('Movimiento de stock %s creado en estado borrador', move.name)
                 move._action_confirm()
                 _logger.info('Movimiento de stock %s confirmado', move.name)
+
+                # Crear líneas de movimiento con quants asignados
+                for lot in lot_to_use:
+                    quant = self.env['stock.quant'].search([
+                        ('product_id', '=', product.id),
+                        ('location_id', '=', self.location_id.id),
+                        ('lot_id', '=', lot.id)
+                    ], limit=1)
+                    if quant:
+                        move_line = self.env['stock.move.line'].create({
+                            'move_id': move.id,
+                            'product_id': product.id,
+                            'lot_id': lot.id,
+                            'qty_done': line.used_kilos,
+                            'location_id': location_src_id,
+                            'location_dest_id': location_dest_id,
+                            'product_uom_id': product.uom_id.id,
+                            'quant_id': quant.id
+                        })
+                        _logger.info('Línea de movimiento creada: %s', move_line.name)
+
                 move._action_assign()
                 _logger.info('Movimiento de stock %s asignado', move.name)
                 move._action_done()
