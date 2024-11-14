@@ -121,11 +121,13 @@ class MeatProcessingOrder(models.Model):
                         'location_id': location_src_id,
                         'location_dest_id': location_dest_id,
                         'lot_id': lot.id,
-                        'qty_done': line.used_kilos,  # Asegúrate de que sea coherente con los kilos usados
+                        'quantity': line.used_kilos,  # Usar el campo adecuado para la cantidad
                     })
 
                 move._action_assign()
                 move._action_done()
+
+
 
 
 
