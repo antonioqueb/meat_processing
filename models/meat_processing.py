@@ -115,15 +115,24 @@ class MeatProcessingOrder(models.Model):
 
     def _create_production_orders(self):
         for line in self.order_line_ids:
-            # Encuentra la BoM asociada al producto utilizando _bom_find con un recordset
-            bom = self.env['mrp.bom']._bom_find(
-                products=line.product_id, 
-                company_id=self.env.company.id
-            ).get(line.product_id)
+            # Verifica si usar product o product_tmpl
+            if line.product_id:
+                bom = self.env['mrp.bom']._bom_find(
+                    product=line.product_id,
+                    picking_type=self.picking_type_id,
+                    company_id=self.company_id.id
+                )
+            else:
+                bom = self.env['mrp.bom']._bom_find(
+                    product_tmpl=line.product_tmpl_id,
+                    picking_type=self.picking_type_id,
+                    company_id=self.company_id.id
+                )
+
             if not bom:
                 raise UserError(_('No se encontró una lista de materiales para el producto %s.') % line.product_id.display_name)
 
-            # Crear la orden de producción
+            # Crea la orden de producción
             production = self.env['mrp.production'].create({
                 'product_id': line.product_id.id,
                 'product_qty': line.quantity,
