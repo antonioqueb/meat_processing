@@ -74,6 +74,7 @@ class MeatProcessingOrder(models.Model):
         
         self._validate_lots()
         self._create_stock_moves()
+        self._create_production_orders()
         self.write({'state': 'done'})
         _logger.info('Orden %s finalizada con éxito', self.name)
 
@@ -90,14 +91,12 @@ class MeatProcessingOrder(models.Model):
 
         for line in self.order_line_ids:
             for product in self.product_ids:
-                # Filtrar los lotes disponibles para el producto
                 lot_to_use = self.raw_material_lot_ids.filtered(lambda l: l.product_id == product)
                 if not lot_to_use:
                     raise UserError(_('No se encontraron lotes disponibles para el producto %(product)s.') % {
                         'product': product.display_name
                     })
 
-                # Crear el movimiento de inventario
                 move = self.env['stock.move'].create({
                     'name': _('Consumo de %(product)s para %(line_product)s') % {
                         'product': product.display_name,
@@ -111,25 +110,27 @@ class MeatProcessingOrder(models.Model):
                     'state': 'draft',
                 })
                 move._action_confirm()
-
-                # Crear líneas de movimiento y asignar lotes
-                for lot in lot_to_use:
-                    self.env['stock.move.line'].create({
-                        'move_id': move.id,
-                        'product_id': product.id,
-                        'product_uom_id': product.uom_id.id,
-                        'location_id': location_src_id,
-                        'location_dest_id': location_dest_id,
-                        'lot_id': lot.id,
-                        'quantity': line.used_kilos,  # Usar el campo adecuado para la cantidad
-                    })
-
                 move._action_assign()
                 move._action_done()
 
+    def _create_production_orders(self):
+        for line in self.order_line_ids:
+            bom = self.env['mrp.bom']._bom_find(product=line.product_id)
+            if not bom:
+                raise UserError(_('No se encontró una lista de materiales para el producto %s.') % line.product_id.display_name)
 
-
-
+            production = self.env['mrp.production'].create({
+                'product_id': line.product_id.id,
+                'product_qty': line.quantity,
+                'product_uom_id': line.uom_id.id,
+                'bom_id': bom.id,
+                'location_src_id': self.location_id.id,
+                'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                'origin': self.name,
+            })
+            production.action_confirm()
+            production.action_assign()
+            production.button_plan()
 
     def _get_location_production_id(self):
         try:
