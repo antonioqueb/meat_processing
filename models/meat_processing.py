@@ -115,31 +115,34 @@ class MeatProcessingOrder(models.Model):
 
     def _create_production_orders(self):
         for line in self.order_line_ids:
-            # Verifica si usar product o product_tmpl
-            if line.product_id:
-                bom = self.env['mrp.bom']._bom_find(
-                    product=line.product_id,
-                    picking_type=self.picking_type_id,
-                    company_id=self.company_id.id
-                )
-            else:
-                bom = self.env['mrp.bom']._bom_find(
-                    product_tmpl=line.product_tmpl_id,
-                    picking_type=self.picking_type_id,
-                    company_id=self.company_id.id
-                )
+            if not line.product_id and not line.product_tmpl_id:
+                raise UserError(_('La línea de orden no tiene un producto o plantilla definidos.'))
+
+            # Buscar el BOM usando producto o plantilla
+            bom = self.env['mrp.bom']._bom_find(
+                product=line.product_id,
+                product_tmpl=line.product_tmpl_id,
+                picking_type=self.picking_type_id,
+                company_id=self.company_id.id
+            )
 
             if not bom:
-                raise UserError(_('No se encontró una lista de materiales para el producto %s.') % line.product_id.display_name)
+                raise UserError(_('No se encontró una lista de materiales para el producto %s.') % (
+                    line.product_id.display_name or line.product_tmpl_id.display_name))
 
-            # Crea la orden de producción
+            # Validar ubicación de destino
+            location_dest = self.env.ref('stock.stock_location_stock', raise_if_not_found=False)
+            if not location_dest:
+                raise UserError(_('La ubicación de destino no está configurada en el sistema.'))
+
+            # Crear la orden de producción
             production = self.env['mrp.production'].create({
                 'product_id': line.product_id.id,
                 'product_qty': line.quantity,
                 'product_uom_id': line.uom_id.id,
                 'bom_id': bom.id,
                 'location_src_id': self.location_id.id,
-                'location_dest_id': self.env.ref('stock.stock_location_stock').id,
+                'location_dest_id': location_dest.id,
                 'origin': self.name,
             })
 
