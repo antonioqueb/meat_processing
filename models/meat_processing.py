@@ -25,17 +25,12 @@ class MeatProcessingOrder(models.Model):
     order_line_ids = fields.One2many('meat.processing.order.line', 'order_id', string='Líneas de Orden', required=True)
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
-    raw_material_lot_ids = fields.Many2many('stock.lot', string='Lotes de Materia Prima')  # No computado, se selecciona manualmente
+    raw_material_lot_ids = fields.Many2many('stock.lot', string='Lotes de Materia Prima')
 
     start_time = fields.Datetime(string='Hora de Inicio', default=fields.Datetime.now)
     responsible_id = fields.Many2one('res.users', string='Responsable', index=True)
     progress = fields.Float(string='Progreso', compute='_compute_progress', store=True)
     purchase_order_id = fields.Many2one('purchase.order', string='Orden de Compra de Origen', readonly=True)
-    
-    can_confirm = fields.Boolean(string='Puede Confirmar', compute='_compute_can_confirm')
-    can_done = fields.Boolean(string='Puede Finalizar', compute='_compute_can_done')
-    can_cancel = fields.Boolean(string='Puede Cancelar', compute='_compute_can_cancel')
-    can_set_to_draft = fields.Boolean(string='Puede Restablecer a Borrador', compute='_compute_can_set_to_draft')
 
     @api.model
     def create(self, vals):
@@ -56,100 +51,48 @@ class MeatProcessingOrder(models.Model):
     @api.depends('total_kilos', 'processed_kilos')
     def _compute_remaining_kilos(self):
         for order in self:
-            order.remaining_kilos = (order.total_kilos or 0.0) - order.processed_kilos
+            order.remaining_kilos = max(0, (order.total_kilos or 0.0) - order.processed_kilos)
 
     @api.depends('processed_kilos', 'order_line_ids.used_kilos')
     def _compute_waste_kilos(self):
         for order in self:
             total_used_kilos = sum(line.used_kilos for line in order.order_line_ids)
-            order.waste_kilos = total_used_kilos - order.processed_kilos
+            order.waste_kilos = max(0, total_used_kilos - order.processed_kilos)
 
-    @api.depends('state')
-    def _compute_can_confirm(self):
-        for order in self:
-            order.can_confirm = order.state == 'draft'
-
-    @api.depends('state')
-    def _compute_can_done(self):
-        for order in self:
-            order.can_done = order.state == 'processing'
-
-    @api.depends('state')
-    def _compute_can_cancel(self):
-        for order in self:
-            order.can_cancel = order.state in ['draft', 'processing']
-
-    @api.depends('state')
-    def _compute_can_set_to_draft(self):
-        for order in self:
-            order.can_set_to_draft = order.state == 'cancelled'
-    
     @api.depends('processed_kilos', 'total_kilos')
     def _compute_progress(self):
         for order in self:
             order.progress = (order.processed_kilos / order.total_kilos) * 100 if order.total_kilos > 0 else 0
 
     def action_confirm(self):
-        self.ensure_one()
         self.write({'state': 'processing'})
 
     def action_done(self):
-        self.ensure_one()
         _logger.info('Iniciando action_done para la orden: %s', self.name)
         if self.state != 'processing':
-            raise UserError('Solo se pueden finalizar órdenes en estado En Proceso.')
-
-        # Validar que todos los productos tienen lotes asignados
-        for line in self.order_line_ids:
-            _logger.info('Validando lotes para el producto %s en la línea de orden %s', line.product_id.display_name, line.name)
-            if not line.item_lot_ids:
-                _logger.warning('No se ha proporcionado el número de lote o serie para el producto %s en la línea de orden %s.', line.product_id.display_name, line.name)
-                raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (line.product_id.display_name, line.name))
-
+            raise UserError(_('Solo se pueden finalizar órdenes en estado En Proceso.'))
+        
+        self._validate_lots()
         self._create_stock_moves()
         self._create_production_orders()
         self.write({'state': 'done'})
         _logger.info('Orden %s finalizada con éxito', self.name)
 
-    def _check_product_availability(self, product, location, quantity):
-        _logger.info('Comprobando disponibilidad del producto %s en la ubicación %s', product.display_name, location.display_name)
-        quants = self.env['stock.quant'].search([
-            ('product_id', '=', product.id),
-            ('location_id', '=', location.id)
-        ])
-        available_qty = sum(quant.quantity - quant.reserved_quantity for quant in quants)
-        _logger.info('Cantidad disponible de %s en %s: %s', product.display_name, location.display_name, available_qty)
-        if available_qty < quantity:
-            _logger.warning(
-                'No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s',
-                product.display_name, location.display_name, available_qty, quantity
-            )
-            raise UserError(
-                _('No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s') % (
-                    product.display_name, location.display_name, available_qty, quantity
-                )
-            )
+    def _validate_lots(self):
+        for line in self.order_line_ids:
+            if not line.item_lot_ids:
+                raise UserError(_('Debe proporcionar el número de lote o serie para %s.') % line.product_id.display_name)
 
     def _create_stock_moves(self):
         location_src_id = self.location_id.id
         location_dest_id = self._get_location_production_id()
-        _logger.info('Creando movimientos de stock de %s a %s', self.location_id.display_name, self.env['stock.location'].browse(location_dest_id).display_name)
 
         for line in self.order_line_ids:
             for product in self.product_ids:
-                _logger.info('Procesando producto %s para la línea %s', product.display_name, line.name)
-                self._check_product_availability(product, self.location_id, line.used_kilos)
-
-                if not self.raw_material_lot_ids:
-                    _logger.warning('No se proporcionaron lotes para el producto %s en la línea de orden %s', product.display_name, line.name)
-                    raise UserError(_('Debe proporcionar el número de lote o serie para el producto %s en la línea de orden %s.') % (product.display_name, line.name))
-
                 lot_to_use = self.raw_material_lot_ids.filtered(lambda l: l.product_id == product)
-                _logger.info('Lotes disponibles para el producto %s: %s', product.display_name, lot_to_use.mapped('name'))
                 if not lot_to_use:
                     raise UserError(_('No se encontraron lotes disponibles para el producto %s.') % product.display_name)
 
-                _logger.info('Creando movimiento de stock para el producto %s con los lotes %s', product.display_name, lot_to_use.mapped('name'))
                 move = self.env['stock.move'].create({
                     'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
                     'product_id': product.id,
@@ -159,40 +102,14 @@ class MeatProcessingOrder(models.Model):
                     'location_dest_id': location_dest_id,
                     'state': 'draft',
                 })
-                _logger.info('Movimiento de stock %s creado en estado borrador', move.display_name)
                 move._action_confirm()
-                _logger.info('Movimiento de stock %s confirmado', move.display_name)
-
-                # Crear líneas de movimiento con quants asignados
-                for lot in lot_to_use:
-                    quant = self.env['stock.quant'].search([
-                        ('product_id', '=', product.id),
-                        ('location_id', '=', self.location_id.id),
-                        ('lot_id', '=', lot.id)
-                    ], limit=1)
-                    if quant:
-                        move_line = self.env['stock.move.line'].create({
-                            'move_id': move.id,
-                            'product_id': product.id,
-                            'lot_id': lot.id,
-                            'quantity': line.used_kilos,  # Ajustado el campo correcto
-                            'location_id': location_src_id,
-                            'location_dest_id': location_dest_id,
-                            'product_uom_id': product.uom_id.id,
-                            'quant_id': quant.id
-                        })
-                        _logger.info('Línea de movimiento creada: %s', move_line.display_name)
-
                 move._action_assign()
-                _logger.info('Movimiento de stock %s asignado', move.display_name)
                 move._action_done()
-                _logger.info('Movimiento de stock %s finalizado', move.display_name)
 
     def _get_location_production_id(self):
         try:
             return self.env.ref('stock.stock_location_production').id
         except ValueError:
-            _logger.warning('Referencia de ubicación de producción no encontrada, buscando manualmente')
             production_location = self.env['stock.location'].search([('usage', '=', 'production')], limit=1)
             if production_location:
                 return production_location.id
@@ -200,12 +117,7 @@ class MeatProcessingOrder(models.Model):
                 raise UserError('No se encontró una ubicación de producción válida en el sistema.')
 
     def _create_production_orders(self):
-        self.ensure_one()
-        if not self.product_ids:
-            raise UserError('La Orden de Despiece debe tener al menos un producto.')
-
         for line in self.order_line_ids:
-            _logger.info('Creando BOM para el producto %s en la línea %s', line.product_id.display_name, line.name)
             bom = self.env['mrp.bom'].create({
                 'product_tmpl_id': line.product_id.product_tmpl_id.id,
                 'product_qty': line.quantity,
@@ -213,15 +125,6 @@ class MeatProcessingOrder(models.Model):
                 'type': 'normal',
             })
 
-            _logger.info('Agregando línea BOM para el producto %s con cantidad %s', self.product_ids[0].display_name, line.used_kilos)
-            self.env['mrp.bom.line'].create({
-                'bom_id': bom.id,
-                'product_id': self.product_ids[0].id,
-                'product_qty': line.used_kilos,
-                'product_uom_id': self.env.ref('uom.product_uom_kgm').id,
-            })
-
-            _logger.info('Creando orden de producción para el producto %s', line.product_id.display_name)
             production = self.env['mrp.production'].create({
                 'product_id': line.product_id.id,
                 'product_qty': line.quantity,
@@ -231,24 +134,16 @@ class MeatProcessingOrder(models.Model):
                 'location_dest_id': self.env.ref('stock.stock_location_stock').id,
                 'origin': self.name,
             })
-
-            _logger.info('Confirmando orden de producción %s', production.name)
             production.action_confirm()
-            _logger.info('Asignando orden de producción %s', production.name)
             production.action_assign()
-            _logger.info('Planificando orden de producción %s', production.name)
             production.button_plan()
-            _logger.info('Marcando como hecha la orden de producción %s', production.name)
             production.button_mark_done()
 
     def action_cancel(self):
-        self.ensure_one()
         self.write({'state': 'cancelled'})
 
     def action_set_to_draft(self):
-        self.ensure_one()
         self.write({'state': 'draft'})
-
 
 class MeatProcessingOrderLine(models.Model):
     _name = 'meat.processing.order.line'
@@ -274,4 +169,4 @@ class MeatProcessingOrderLine(models.Model):
         if self.product_id:
             return {'domain': {'item_lot_ids': [('product_id', '=', self.product_id.id)]}}
         else:
-            return {'domain': {'item_lot_ids': [('id', '=', False)]}}  # No mostrar lotes si no hay producto seleccionado
+            return {'domain': {'item_lot_ids': [('id', '=', False)]}}
