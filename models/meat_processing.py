@@ -184,12 +184,16 @@ class MeatProcessingOrderLine(models.Model):
     @api.onchange('product_id')
     def _onchange_product_id(self):
         if self.product_id:
-            suggested_lots = self.env['stock.lot'].search([
+            # Buscar lotes relacionados con cantidades disponibles
+            quants = self.env['stock.quant'].search([
                 ('product_id', '=', self.product_id.id),
-                ('quantity', '>', 0)
-            ], order='create_date ASC', limit=5)  # FIFO
+                ('quantity', '>', 0),
+                ('location_id', '=', self.order_id.location_id.id),
+                ('lot_id', '!=', False)
+            ])
+            suggested_lots = quants.mapped('lot_id')
             self.item_lot_ids = suggested_lots
-            return {'domain': {'item_lot_ids': [('product_id', '=', self.product_id.id)]}}
+            return {'domain': {'item_lot_ids': [('id', 'in', suggested_lots.ids)]}}
         else:
             self.item_lot_ids = False
             return {'domain': {'item_lot_ids': [('id', '=', False)]}}
