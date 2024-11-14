@@ -114,7 +114,7 @@ class MeatProcessingOrder(models.Model):
 
     def _create_production_orders(self):
         for line in self.order_line_ids:
-            bom = self.env['mrp.bom']._bom_find(product=line.product_id, company_id=self.env.company.id)
+            bom = self.env['mrp.bom']._bom_find(product_tmpl=line.product_id.product_tmpl_id, company_id=self.env.company.id)
             if not bom:
                 raise UserError(_('No se encontró una lista de materiales para el producto %s.') % line.product_id.display_name)
 
