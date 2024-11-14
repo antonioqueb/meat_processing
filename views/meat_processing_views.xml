@@ -109,8 +109,6 @@
             <field name="search_view_id" ref="view_meat_processing_order_search"/>
         </record>
 
-        <!-- Menú para Órdenes de Procesamiento -->
-        <menuitem id="menu_meat_processing_root" name="Despiece" />
-        <menuitem id="menu_meat_processing_orders" name="Órdenes" parent="menu_meat_processing_root" action="action_meat_processing_orders" />
+    
     </data>
 </odoo>
