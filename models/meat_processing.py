@@ -74,7 +74,6 @@ class MeatProcessingOrder(models.Model):
         
         self._validate_lots()
         self._create_stock_moves()
-        self._create_production_orders()
         self.write({'state': 'done'})
         _logger.info('Orden %s finalizada con éxito', self.name)
 
@@ -91,12 +90,14 @@ class MeatProcessingOrder(models.Model):
 
         for line in self.order_line_ids:
             for product in self.product_ids:
+                # Filtrar los lotes disponibles para el producto
                 lot_to_use = self.raw_material_lot_ids.filtered(lambda l: l.product_id == product)
                 if not lot_to_use:
                     raise UserError(_('No se encontraron lotes disponibles para el producto %(product)s.') % {
                         'product': product.display_name
                     })
 
+                # Crear el movimiento de inventario
                 move = self.env['stock.move'].create({
                     'name': _('Consumo de %(product)s para %(line_product)s') % {
                         'product': product.display_name,
@@ -108,14 +109,25 @@ class MeatProcessingOrder(models.Model):
                     'location_id': location_src_id,
                     'location_dest_id': location_dest_id,
                     'state': 'draft',
-                    'move_line_ids': [(0, 0, {
-                        'lot_id': lot.id,
-                        'qty_done': line.used_kilos
-                    }) for lot in line.item_lot_ids]
                 })
                 move._action_confirm()
+
+                # Crear líneas de movimiento y asignar lotes
+                for lot in lot_to_use:
+                    self.env['stock.move.line'].create({
+                        'move_id': move.id,
+                        'product_id': product.id,
+                        'product_uom_id': product.uom_id.id,
+                        'location_id': location_src_id,
+                        'location_dest_id': location_dest_id,
+                        'lot_id': lot.id,
+                        'qty_done': line.used_kilos,  # Asegúrate de que sea coherente con los kilos usados
+                    })
+
                 move._action_assign()
                 move._action_done()
+
+
 
     def _get_location_production_id(self):
         try:
@@ -126,29 +138,6 @@ class MeatProcessingOrder(models.Model):
                 return production_location.id
             else:
                 raise UserError(_('No se encontró una ubicación de producción válida en el sistema.'))
-
-    def _create_production_orders(self):
-        for line in self.order_line_ids:
-            bom = self.env['mrp.bom'].create({
-                'product_tmpl_id': line.product_id.product_tmpl_id.id,
-                'product_qty': line.quantity,
-                'product_uom_id': line.uom_id.id,
-                'type': 'normal',
-            })
-
-            production = self.env['mrp.production'].create({
-                'product_id': line.product_id.id,
-                'product_qty': line.quantity,
-                'product_uom_id': line.uom_id.id,
-                'bom_id': bom.id,
-                'location_src_id': self.location_id.id,
-                'location_dest_id': self.env.ref('stock.stock_location_stock').id,
-                'origin': self.name,
-            })
-            production.action_confirm()
-            production.action_assign()
-            production.button_plan()
-            production.button_mark_done()
 
     def action_cancel(self):
         self.write({'state': 'cancelled'})
@@ -184,7 +173,6 @@ class MeatProcessingOrderLine(models.Model):
     @api.onchange('product_id')
     def _onchange_product_id(self):
         if self.product_id:
-            # Buscar lotes relacionados con cantidades disponibles
             quants = self.env['stock.quant'].search([
                 ('product_id', '=', self.product_id.id),
                 ('quantity', '>', 0),
