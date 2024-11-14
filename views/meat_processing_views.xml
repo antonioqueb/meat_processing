@@ -31,16 +31,16 @@
             <field name="arch" type="xml">
                 <form string="Orden de Despiece">
                     <header>
-                        <button string="Confirmar" type="object" name="action_confirm" states="draft" class="btn-primary"/>
-                        <button string="Hecho" type="object" name="action_done" states="processing" class="btn-success"/>
-                        <button string="Cancelar" type="object" name="action_cancel" states="draft,processing" class="btn-danger"/>
-                        <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" states="cancelled" class="btn-secondary"/>
+                        <button string="Confirmar" type="object" name="action_confirm" class="btn-primary"/>
+                        <button string="Hecho" type="object" name="action_done" class="btn-success"/>
+                        <button string="Cancelar" type="object" name="action_cancel" class="btn-danger"/>
+                        <button string="Restablecer a Borrador" type="object" name="action_set_to_draft" class="btn-secondary"/>
                     </header>
                     <sheet>
                         <group>
                             <field name="name" readonly="1"/>
                             <field name="order_date"/>
-                            <field name="product_ids"/>
+                            <field name="product_ids" widget="many2many_tags"/>
                             <field name="location_id"/>
                             <field name="total_kilos" required="1"/>
                             <field name="processed_kilos" readonly="1"/>
@@ -51,7 +51,7 @@
                             <field name="responsible_id"/>
                             <field name="notes"/>
                             <field name="purchase_order_id" readonly="1"/>
-                            <field name="raw_material_lot_ids"/>
+                            <field name="raw_material_lot_ids" widget="many2many_tags"/>
                         </group>
                         <group>
                             <field name="order_line_ids">
@@ -62,7 +62,7 @@
                                     <field name="unit_price"/>
                                     <field name="uom_id"/>
                                     <field name="subtotal"/>
-                                    <field name="item_lot_ids"/>
+                                    <field name="item_lot_ids" widget="many2many_tags"/>
                                 </tree>
                             </field>
                         </group>
@@ -70,8 +70,8 @@
                 </form>
             </field>
         </record>
-        
-         <!-- Vista Calendario de Órdenes de Procesamiento -->
+
+        <!-- Vista de Calendario de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_calendar" model="ir.ui.view">
             <field name="name">meat.processing.order.calendar</field>
             <field name="model">meat.processing.order</field>
@@ -81,7 +81,6 @@
                 </calendar>
             </field>
         </record>
-
 
         <!-- Vista de Búsqueda de Órdenes de Procesamiento -->
         <record id="view_meat_processing_order_search" model="ir.ui.view">
@@ -105,9 +104,13 @@
         <record id="action_meat_processing_orders" model="ir.actions.act_window">
             <field name="name">Órdenes de Despiece</field>
             <field name="res_model">meat.processing.order</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,calendar</field>
             <field name="view_id" ref="view_meat_processing_order_tree"/>
             <field name="search_view_id" ref="view_meat_processing_order_search"/>
         </record>
+
+        <!-- Menú para Órdenes de Procesamiento -->
+        <menuitem id="menu_meat_processing_root" name="Despiece" />
+        <menuitem id="menu_meat_processing_orders" name="Órdenes" parent="menu_meat_processing_root" action="action_meat_processing_orders" />
     </data>
 </odoo>
