@@ -4,6 +4,7 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
+
 class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
     _description = 'Orden de Despiece de Carne'
@@ -26,7 +27,6 @@ class MeatProcessingOrder(models.Model):
     total_amount = fields.Float(string='Monto Total', compute='_compute_total_amount', store=True)
     notes = fields.Text(string='Notas')
     raw_material_lot_ids = fields.Many2many('stock.lot', string='Lotes de Materia Prima')
-
     start_time = fields.Datetime(string='Hora de Inicio', default=fields.Datetime.now)
     responsible_id = fields.Many2one('res.users', string='Responsable', index=True)
     progress = fields.Float(string='Progreso', compute='_compute_progress', store=True)
@@ -107,7 +107,6 @@ class MeatProcessingOrder(models.Model):
                     'product_uom': product.uom_id.id,
                     'location_id': location_src_id,
                     'location_dest_id': location_dest_id,
-                    'state': 'draft',
                 })
                 move._action_confirm()
                 move._action_assign()
