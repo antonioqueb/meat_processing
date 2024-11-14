@@ -115,20 +115,18 @@ class MeatProcessingOrder(models.Model):
 
     def _create_production_orders(self):
         for line in self.order_line_ids:
-            if not line.product_id and not line.product_tmpl_id:
-                raise UserError(_('La línea de orden no tiene un producto o plantilla definidos.'))
+            if not line.product_id:
+                raise UserError(_('La línea de orden no tiene un producto definido.'))
 
-            # Buscar el BOM usando producto o plantilla
+            # Buscar el BOM usando el producto
             bom = self.env['mrp.bom']._bom_find(
                 product=line.product_id,
-                product_tmpl=line.product_tmpl_id,
                 picking_type=self.picking_type_id,
                 company_id=self.company_id.id
             )
 
             if not bom:
-                raise UserError(_('No se encontró una lista de materiales para el producto %s.') % (
-                    line.product_id.display_name or line.product_tmpl_id.display_name))
+                raise UserError(_('No se encontró una lista de materiales para el producto %s.') % line.product_id.display_name)
 
             # Validar ubicación de destino
             location_dest = self.env.ref('stock.stock_location_stock', raise_if_not_found=False)
@@ -150,7 +148,6 @@ class MeatProcessingOrder(models.Model):
             production.action_confirm()
             production.action_assign()
             production.button_plan()
-
 
 
     def _get_location_production_id(self):
