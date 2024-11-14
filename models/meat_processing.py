@@ -108,6 +108,10 @@ class MeatProcessingOrder(models.Model):
                     'location_id': location_src_id,
                     'location_dest_id': location_dest_id,
                     'state': 'draft',
+                    'move_line_ids': [(0, 0, {
+                        'lot_id': lot.id,
+                        'qty_done': line.used_kilos
+                    }) for lot in line.item_lot_ids]
                 })
                 move._action_confirm()
                 move._action_assign()
@@ -165,15 +169,27 @@ class MeatProcessingOrderLine(models.Model):
     subtotal = fields.Float(string='Subtotal', compute='_compute_subtotal', store=True)
     uom_id = fields.Many2one('uom.uom', string='Unidad de Medida', required=True, default=lambda self: self.env.ref('uom.product_uom_kgm').id)
     item_lot_ids = fields.Many2many('stock.lot', string='Lotes del Producto')
+    lot_names = fields.Char(string='Lotes Seleccionados', compute='_compute_lot_names')
 
     @api.depends('quantity', 'unit_price')
     def _compute_subtotal(self):
         for line in self:
             line.subtotal = line.quantity * line.unit_price
 
+    @api.depends('item_lot_ids')
+    def _compute_lot_names(self):
+        for line in self:
+            line.lot_names = ', '.join(line.item_lot_ids.mapped('name'))
+
     @api.onchange('product_id')
     def _onchange_product_id(self):
         if self.product_id:
+            suggested_lots = self.env['stock.lot'].search([
+                ('product_id', '=', self.product_id.id),
+                ('quantity', '>', 0)
+            ], order='create_date ASC', limit=5)  # FIFO
+            self.item_lot_ids = suggested_lots
             return {'domain': {'item_lot_ids': [('product_id', '=', self.product_id.id)]}}
         else:
+            self.item_lot_ids = False
             return {'domain': {'item_lot_ids': [('id', '=', False)]}}
