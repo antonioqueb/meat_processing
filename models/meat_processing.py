@@ -120,8 +120,15 @@ class MeatProcessingOrder(models.Model):
         available_qty = sum(quant.quantity - quant.reserved_quantity for quant in quants)
         _logger.info('Cantidad disponible de %s en %s: %s', product.display_name, location.display_name, available_qty)
         if available_qty < quantity:
-            _logger.warning('No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s', product.display_name, location.display_name, available_qty, quantity)
-            raise UserError(_('No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s') % (product.display_name, location.display_name, available_qty))
+            _logger.warning(
+                'No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s',
+                product.display_name, location.display_name, available_qty, quantity
+            )
+            raise UserError(
+                _('No hay suficiente cantidad de %s en %s. Cantidad disponible: %s, Cantidad requerida: %s') % (
+                    product.display_name, location.display_name, available_qty, quantity
+                )
+            )
 
     def _create_stock_moves(self):
         location_src_id = self.location_id.id
