@@ -81,7 +81,9 @@ class MeatProcessingOrder(models.Model):
     def _validate_lots(self):
         for line in self.order_line_ids:
             if not line.item_lot_ids:
-                raise UserError(_('Debe proporcionar el número de lote o serie para %s.') % line.product_id.display_name)
+                raise UserError(_('Debe proporcionar el número de lote o serie para %(product)s.') % {
+                    'product': line.product_id.display_name
+                })
 
     def _create_stock_moves(self):
         location_src_id = self.location_id.id
@@ -91,10 +93,15 @@ class MeatProcessingOrder(models.Model):
             for product in self.product_ids:
                 lot_to_use = self.raw_material_lot_ids.filtered(lambda l: l.product_id == product)
                 if not lot_to_use:
-                    raise UserError(_('No se encontraron lotes disponibles para el producto %s.') % product.display_name)
+                    raise UserError(_('No se encontraron lotes disponibles para el producto %(product)s.') % {
+                        'product': product.display_name
+                    })
 
                 move = self.env['stock.move'].create({
-                    'name': _('Consumo de %s para %s') % (product.display_name, line.product_id.display_name),
+                    'name': _('Consumo de %(product)s para %(line_product)s') % {
+                        'product': product.display_name,
+                        'line_product': line.product_id.display_name
+                    },
                     'product_id': product.id,
                     'product_uom_qty': line.used_kilos,
                     'product_uom': product.uom_id.id,
@@ -114,7 +121,7 @@ class MeatProcessingOrder(models.Model):
             if production_location:
                 return production_location.id
             else:
-                raise UserError('No se encontró una ubicación de producción válida en el sistema.')
+                raise UserError(_('No se encontró una ubicación de producción válida en el sistema.'))
 
     def _create_production_orders(self):
         for line in self.order_line_ids:
