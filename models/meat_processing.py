@@ -115,11 +115,11 @@ class MeatProcessingOrder(models.Model):
 
     def _create_production_orders(self):
         for line in self.order_line_ids:
-            # Encuentra la BoM asociada utilizando product_tmpl_id
+            # Encuentra la BoM asociada al producto utilizando _bom_find con un recordset
             bom = self.env['mrp.bom']._bom_find(
-                product_tmpl_id=line.product_id.product_tmpl_id.id,
+                products=line.product_id, 
                 company_id=self.env.company.id
-            )
+            ).get(line.product_id)
             if not bom:
                 raise UserError(_('No se encontró una lista de materiales para el producto %s.') % line.product_id.display_name)
 
@@ -138,6 +138,7 @@ class MeatProcessingOrder(models.Model):
             production.action_confirm()
             production.action_assign()
             production.button_plan()
+
 
 
     def _get_location_production_id(self):
