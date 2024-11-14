@@ -4,7 +4,6 @@ import logging
 
 _logger = logging.getLogger(__name__)
 
-
 class MeatProcessingOrder(models.Model):
     _name = 'meat.processing.order'
     _description = 'Orden de Despiece de Carne'
@@ -114,7 +113,7 @@ class MeatProcessingOrder(models.Model):
 
     def _create_production_orders(self):
         for line in self.order_line_ids:
-            bom = self.env['mrp.bom']._bom_find(product_tmpl=line.product_id.product_tmpl_id)
+            bom = self.env['mrp.bom']._bom_find(products=line.product_id, company_id=self.env.company.id, bom_type='normal')
             if not bom:
                 raise UserError(_('No se encontró una lista de materiales para el producto %s.') % line.product_id.display_name)
 
